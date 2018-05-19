@@ -1,0 +1,21 @@
+{
+  "name": "nodewords",
+  "version": "1.0.0",
+  "description": "Command line word games",
+  "main": "index.js",
+  "author": "(Heather Roberts <heather.roberts427@gmail.com>)",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "clear": "^0.1.0",
+    "clui": "^0.3.6",
+    "figlet": "^1.2.0",
+    "inquirer": "^5.2.0",
+    "minimist": "^1.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.12.0"
+  }
+}
