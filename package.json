@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "description": "Command line word games",
   "main": "index.js",
-  "author": "(Heather Roberts <heather.roberts427@gmail.com>)",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": {
+    "name": "Heather Roberts",
+    "email": "heather.roberts427@gmail.com>"
+  },
   "license": "MIT",
   "dependencies": {
     "chalk": "^2.4.1",
