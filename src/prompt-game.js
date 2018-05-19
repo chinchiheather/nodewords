@@ -2,9 +2,11 @@ const figlet = require('figlet');
 const inquirer = require('inquirer');
 const clear = require('clear');
 const chalk = require('chalk');
-const anagram = require('./anagram');
+const Anagram = require('./games/anagram');
 
-function promptGame() {
+const anagram = new Anagram(promptChooseGame);
+
+function promptChooseGame() {
   // clear console
   clear();
 
@@ -23,7 +25,7 @@ function promptGame() {
   }]).then((answer) => {
     switch (answer.gameType) {
       case 'anagram':
-        anagram.play();
+        anagram.play(promptChooseGame);
         break;
 
       default:
@@ -41,10 +43,10 @@ function promptChooseAnother() {
     default: true
   }]).then((answer) => {
     if (answer.chooseAnother) {
-      promptGame();
+      promptChooseGame();
     }
   });
 }
 
-module.exports = promptGame;
+module.exports = promptChooseGame;
 

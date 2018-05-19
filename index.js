@@ -1,3 +1,3 @@
-const promptGame = require('./src/prompt-game');
+const promptChooseGame = require('./src/prompt-game');
 
-promptGame();
+promptChooseGame();
