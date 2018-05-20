@@ -4,7 +4,8 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const clui = require('clui');
 const logUpdate = require('log-update');
-require('events').EventEmitter.defaultMaxListeners = 50; // todo: find a better solution to line
+const anagramList = require('../utils/anagram-list');
+require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better solution to line
 
 /**
  * Anagram game - displays shuffled 9 letter word to user and they have to guess what it is
@@ -18,13 +19,7 @@ class AnagramGame {
     this.incorrectGuess = false;
     this.total = 0;
     this.current = 0;
-
-    // todo: get a list of words from somewhere
-    this.words = [
-      'unpuzzled',
-      'blizzards',
-      'objectify'
-    ];
+    this.words = [...anagramList];
   }
 
   /**
@@ -34,30 +29,15 @@ class AnagramGame {
     clear();
 
     const randomIdx = Math.floor(Math.random() * this.words.length);
-    // todo: don't select words user has had before
-    this.answer = this.words[randomIdx];
-    const shuffledWord = this.shuffle(this.answer);
+    const [word] = this.words.splice(randomIdx, 1);
+    const shuffledWord = Object.keys(word)[0];
+    this.answer = word[shuffledWord];
 
     console.log('\n\n\n');
     console.log('Solve the anagram:');
     console.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
 
     this.startCountdown();
-  }
-
-  /**
-   * Returns a randomly shuffled version of the passed in word
-   */
-  shuffle(word) {
-    const shuffledIndices = [...Array(word.length).keys()];
-    // shuffle array in place using modern fisher yates shuffle algorithm
-    for (let i = shuffledIndices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledIndices[i], shuffledIndices[j]] = [shuffledIndices[j], shuffledIndices[i]];
-    }
-
-    const shuffled = shuffledIndices.reduce((prev, curr) => prev + word.charAt(curr), '');
-    return shuffled;
   }
 
   startCountdown() {
