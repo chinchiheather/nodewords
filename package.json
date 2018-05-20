@@ -7,9 +7,12 @@
     "start": "node index.js",
     "lint": "eslint src/**/*.js"
   },
+  "bin": {
+    "nodewords": "./bin/nodewords.js"
+  },
   "author": {
     "name": "Heather Roberts",
-    "email": "heather.roberts427@gmail.com>"
+    "email": "heather.roberts427@gmail.com"
   },
   "license": "MIT",
   "dependencies": {
