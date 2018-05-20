@@ -5,7 +5,7 @@ Command line word games written in node
 ## Setup
 ```bash
 # install with yarn
-yarn add -g nodewords
+yarn global add nodewords
 
 # install with npm
 npm install -g nodewords
