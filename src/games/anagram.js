@@ -49,7 +49,7 @@ class AnagramGame {
 
   resumeCountdown() {
     this.countdownInterval = setInterval(() => {
-      if (--this.current < 0) {
+      if (--this.current === 0) {
         this.stopCountdown();
         this.onTimeUp();
       } else {
@@ -66,7 +66,7 @@ class AnagramGame {
    * Display current timer status in gauge and prompt for user's answer
    */
   displayProgressAndPrompt() {
-    logUpdate(clui.Gauge(this.current, this.total, this.total, this.total, `${this.current}s`));
+    logUpdate(clui.Gauge(this.current, this.total, this.total + 1, this.total, `${this.current}s`));
     this.promptForAnswer();
   }
 
