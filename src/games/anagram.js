@@ -5,6 +5,8 @@ const chalk = require('chalk');
 const clui = require('clui');
 const logUpdate = require('log-update');
 const anagramList = require('../utils/anagram-list');
+const UIHelper = require('../utils/ui-helper');
+const PromptHelper = require('../utils/prompt-helper');
 require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better solution to line
 
 /**
@@ -113,86 +115,21 @@ class AnagramGame {
   onGameWon() {
     this.stopCountdown();
     this.finishGame();
-    this.showAnswer();
-
-    let counter = 0;
-    const starChar = '\u2605';
-    const tripleStars = Array(3).fill(starChar).join(' ');
-    const winnerMessage = `${tripleStars} WINNER! ${tripleStars}\n`;
-    const interval = setInterval(() => {
-      if (counter > 4) {
-        clearInterval(interval);
-        logUpdate.done();
-        this.promptNextGame();
-      } else if (counter++ % 2 === 0) {
-        logUpdate(chalk.black.bgGreen(winnerMessage));
-      } else {
-        logUpdate(chalk.green(winnerMessage));
-      }
-    }, 250);
+    UIHelper.showAnswer(this.answer);
+    UIHelper.flashWinner().then(this.promptChooseGame);
   }
 
   onTimeUp() {
     this.finishGame();
     console.log(chalk.red('\nTIME\'S UP!\n'));
-
-    setTimeout(() => {
-      process.stdout.write('\nThe correct answer was');
-
-      let count = 0;
-      // animate adding ellipsis to end of line
-      const interval = setInterval(() => {
-        process.stdout.write('.');
-        if (++count === 3) {
-          clearInterval(interval);
-
-          setTimeout(() => {
-            process.stdout.write('\n');
-            this.showAnswer();
-            setTimeout(() => { this.promptNextGame(); }, 500);
-          }, 500);
-        }
-      }, 250);
-    }, 500);
+    UIHelper.revealAnswer(this.answer)
+      .then(() => PromptHelper.promptNextGame('anagram', () => this.play, this.promptChooseGame));
   }
 
   finishGame() {
     logUpdate.clear();
     this.answerPrompt.ui.close();
     this.answerPrompt = null;
-  }
-
-  showAnswer() {
-    console.log(chalk.green(figlet.textSync(this.answer, { font: 'Cybermedium' })));
-  }
-
-  /**
-   * Display prompt to user asking them what they want to do next
-   * This is shown after a game ends (win or lose)
-   */
-  promptNextGame() {
-    inquirer.prompt([{
-      type: 'list',
-      name: 'nextGame',
-      message: 'Play again?',
-      choices: [
-        { name: 'Play another anagram game', value: 'anagram' },
-        { name: 'Play a different game', value: 'different' },
-        { name: 'I\'m done for now, exit Nodewords', value: 'exit' }
-      ]
-    }]).then((answer) => {
-      switch (answer.nextGame) {
-        case 'anagram':
-          this.play();
-          break;
-
-        case 'different':
-          this.promptChooseGame();
-          break;
-
-        default: break;
-      }
-    });
   }
 }
 

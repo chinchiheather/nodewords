@@ -3,11 +3,12 @@ const inquirer = require('inquirer');
 const clear = require('clear');
 const chalk = require('chalk');
 const AnagramGame = require('./games/anagram');
+const HangmanGame = require('./games/hangman');
 
 const anagramGame = new AnagramGame(promptChooseGame);
+const hangmanGame = new HangmanGame(promptChooseGame);
 
 function promptChooseGame() {
-  // clear console
   clear();
 
   // display app title
@@ -19,13 +20,17 @@ function promptChooseGame() {
     name: 'gameType',
     message: 'Which game would you like to play?',
     choices: [
-      { name: 'Anagram', value: 'anagram' },
-      { name: 'Hangman', value: 'hangman' }
+      { name: 'Hangman', value: 'hangman' },
+      { name: 'Anagram', value: 'anagram' }
     ]
   }]).then((answer) => {
     switch (answer.gameType) {
       case 'anagram':
-        anagramGame.play(promptChooseGame);
+        anagramGame.play();
+        break;
+
+      case 'hangman':
+        hangmanGame.play();
         break;
 
       default:
