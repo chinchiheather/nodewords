@@ -117,7 +117,7 @@ class AnagramGame {
 
     let counter = 0;
     const starChar = '\u2605';
-    const tripleStars = `${starChar}${starChar}${starChar}`;
+    const tripleStars = Array(3).fill(starChar).join(' ');
     const winnerMessage = `${tripleStars} WINNER! ${tripleStars}\n`;
     const interval = setInterval(() => {
       if (counter > 4) {

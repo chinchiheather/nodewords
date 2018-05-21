@@ -15,6 +15,13 @@
     "email": "heather.roberts427@gmail.com"
   },
   "license": "MIT",
+  "keywords": [
+    "node",
+    "nodejs",
+    "cli",
+    "command-line",
+    "games"
+  ],
   "dependencies": {
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
