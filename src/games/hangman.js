@@ -6,10 +6,14 @@ const chalk = require('chalk');
 const UIHelper = require('../utils/ui-helper');
 const PromptHelper = require('../utils/prompt-helper');
 
+// todo: use constants here and in anagram for magic strings
 class HangmanGame {
   constructor(promptChooseGame) {
     this.promptChooseGame = promptChooseGame;
     this.guessed = [];
+    this.phrase = null;
+    this.count = 0;
+    this.max = 0;
   }
 
   play() {
