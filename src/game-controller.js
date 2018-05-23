@@ -1,4 +1,6 @@
 const chalk = require('chalk');
+const clear = require('clear');
+const figlet = require('figlet');
 const AnagramGame = require('./games/anagram/anagram');
 const HangmanGame = require('./games/hangman/hangman');
 const GamePrompts = require('./game-prompts');
@@ -8,6 +10,9 @@ class GameController {
    * Main menu to select game and play
    */
   pickGame() {
+    clear();
+    console.log(figlet.textSync('Nodewords', { font: 'Ogre' }));
+
     GamePrompts.promptChooseGame().then((answer) => {
       switch (answer.gameType) {
         case 'anagram':

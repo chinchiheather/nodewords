@@ -1,17 +1,14 @@
 const inquirer = require('inquirer');
-const clear = require('clear');
 
 class GamePrompts {
   static promptChooseGame() {
-    clear();
-
     return inquirer.prompt([{
       type: 'list',
       name: 'gameType',
       message: 'Which game would you like to play?',
       choices: [
-        { name: 'Hangman', value: 'hangman' },
         { name: 'Anagram', value: 'anagram' },
+        { name: 'Hangman', value: 'hangman' },
         { name: 'I\'m done for now, exit Nodewords', value: 'exit' }
       ]
     }]);
