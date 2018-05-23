@@ -1,3 +1,6 @@
-const promptChooseGame = require('./src/prompt-game');
+const GameController = require('./src/game-controller');
 
-promptChooseGame();
+(function start() {
+  const gameController = new GameController();
+  gameController.pickGame();
+}());
