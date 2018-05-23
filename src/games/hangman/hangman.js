@@ -3,7 +3,7 @@ const figlet = require('figlet');
 const chalk = require('chalk');
 const UIHelper = require('../../helpers/ui-helper');
 const hangmanStages = require('./hangman-stages');
-const hangmanPrompts = require('./hangman-prompts');
+const HangmanPrompts = require('./hangman-prompts');
 const hangmanWordList = require('./hangman-word-list');
 
 /**
@@ -83,14 +83,14 @@ class HangmanGame {
     } else {
       console.log('Solve the hangman puzzle:\n');
       console.log(figlet.textSync(display, { font: 'Cybermedium' }));
-      hangmanPrompts.promptForGuess().then((answer) => {
+      HangmanPrompts.promptForGuess().then((answer) => {
         switch (answer.guess) {
           case 'letter':
-            this.promptForLetter();
+            this.guessLetter();
             break;
 
           case 'answer':
-            this.promptForAnswer();
+            this.guessAnswer();
             break;
 
           default:
@@ -100,8 +100,8 @@ class HangmanGame {
     }
   }
 
-  promptForLetter() {
-    hangmanPrompts.promptForLetter(this.guessed).then((answer) => {
+  guessLetter() {
+    HangmanPrompts.promptForLetter(this.guessed).then((answer) => {
       this.guessed.push(answer.letter);
       if (this.letters.indexOf(answer.letter) === -1) {
         this.incorrectGuesses++;
@@ -110,8 +110,8 @@ class HangmanGame {
     });
   }
 
-  promptForAnswer() {
-    hangmanPrompts.promptForAnswer().then((answer) => {
+  guessAnswer() {
+    HangmanPrompts.promptForAnswer().then((answer) => {
       if (answer.answer === this.word) {
         this.guessed = [...this.letters];
       } else {
