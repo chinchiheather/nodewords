@@ -95,12 +95,12 @@ class HangmanGame {
   promptForAnswer() {
     hangmanPrompts.promptForAnswer().then((answer) => {
       if (answer.answer === this.word) {
-        this.gameWon();
+        this.guessed = [...this.letters];
       } else {
         console.log(chalk.yellow('\nIncorrect!\n'));
         this.incorrectGuesses++;
-        this.displayHangman();
       }
+      this.displayHangman();
     });
   }
 
