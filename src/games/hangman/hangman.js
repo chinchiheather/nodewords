@@ -1,11 +1,10 @@
-const logUpdate = require('log-update');
 const clear = require('clear');
-const inquirer = require('inquirer');
 const figlet = require('figlet');
 const chalk = require('chalk');
 const UIHelper = require('../../helpers/ui-helper');
 const PromptHelper = require('../../helpers/prompt-helper');
 const hangmanStages = require('./hangman-stages');
+const hangmanPrompts = require('./hangman-prompts');
 
 // todo: use constants here and in anagram for magic strings
 class HangmanGame {
@@ -13,26 +12,34 @@ class HangmanGame {
     this.promptChooseGame = promptChooseGame;
     this.guessed = [];
     this.phrase = null;
-    this.count = 0;
-    this.max = 0;
+    this.incorrectGuesses = 0;
+    this.maxIncorrectGuesses = 0;
   }
 
   play() {
     clear();
     console.log('\n');
 
-    // todo: randomly select a word/phrase
+    // todo: randomly select a word`/phrase
     this.phrase = 'add';
-    this.count = 0;
-    this.max = 11;
+    this.incorrectGuesses = 0;
+    this.maxIncorrectGuesses = 11;
     this.guessed = [];
+    this.letters = [];
+    for (let i = 0, len = this.phrase.length; i < len; i++) {
+      const letter = this.phrase.charAt(i);
+      if (this.letters.indexOf(letter) === -1) {
+        this.letters.push(letter);
+      }
+    }
+
     this.displayHangman();
   }
 
   displayHangman() {
     clear();
 
-    const hangmanImage = hangmanStages[this.count];
+    const hangmanImage = hangmanStages[this.incorrectGuesses];
     console.log(hangmanImage);
 
     let display = '';
@@ -51,21 +58,12 @@ class HangmanGame {
 
     if (hasWon) {
       this.gameWon();
-    } else if (this.count++ === this.max) {
+    } else if (this.incorrectGuesses === this.maxIncorrectGuesses) {
       this.gameLost();
     } else {
-      // todo: use log update
+      console.log('Solve the hangman puzzle:\n');
       console.log(figlet.textSync(display, { font: 'Cybermedium' }));
-
-      inquirer.prompt([{
-        type: 'list',
-        name: 'guessOption',
-        message: 'What do you want to do?',
-        choices: [
-          { name: 'Choose a letter', value: 'letter' },
-          { name: 'Guess the answer!', value: 'answer' }
-        ]
-      }]).then((answer) => {
+      hangmanPrompts.promptForGuess().then((answer) => {
         switch (answer.guessOption) {
           case 'letter':
             this.promptForLetter();
@@ -83,24 +81,25 @@ class HangmanGame {
   }
 
   promptForLetter() {
-    // todo: disallow multiple letters to be input
-    inquirer.prompt([{
-      type: 'input',
-      name: 'letter',
-      message: 'Letter'
-    }]).then((answer) => {
-      if (this.guessed.indexOf(answer.letter) !== -1) {
-        console.log(chalk.yellow('\nOops! You already guessed this one, try a different letter\n'));
-        this.promptForLetter();
-      } else {
-        this.guessed.push(answer.letter);
-        this.displayHangman();
+    hangmanPrompts.promptForLetter(this.guessed).then((answer) => {
+      this.guessed.push(answer.letter);
+      if (this.letters.indexOf(answer.letter) === -1) {
+        this.incorrectGuesses++;
       }
+      this.displayHangman(answer.letter);
     });
   }
 
   promptForAnswer() {
-    // todo:
+    hangmanPrompts.promptForAnswer().then((answer) => {
+      if (answer.answer === this.phrase) {
+        this.gameWon();
+      } else {
+        console.log(chalk.yellow('\nIncorrect!\n'));
+        this.incorrectGuesses++;
+        this.displayHangman();
+      }
+    });
   }
 
   gameWon() {
