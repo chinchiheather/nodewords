@@ -2,31 +2,39 @@ const clear = require('clear');
 const figlet = require('figlet');
 const chalk = require('chalk');
 const UIHelper = require('../../helpers/ui-helper');
-const PromptHelper = require('../../helpers/prompt-helper');
 const hangmanStages = require('./hangman-stages');
 const hangmanPrompts = require('./hangman-prompts');
-const hangmanWords = require('./hangman-word-list');
+const hangmanWordList = require('./hangman-word-list');
+
+/**
+ * Hangman game - displays letter placeholders to user and they guess
+ * letter by letter to complete the word, or can also just go for it and
+ * guess the full answer)
+ */
 
 // todo: use constants here and in anagram for magic strings
 class HangmanGame {
-  constructor(promptChooseGame) {
-    this.promptChooseGame = promptChooseGame;
+  constructor() {
     this.guessed = [];
     this.word = null;
     this.incorrectGuesses = 0;
     this.maxIncorrectGuesses = 0;
+    this.wordList = [...hangmanWordList];
+    this.playPromise = new Promise((resolve) => {
+      this.resolvePlay = resolve;
+    });
   }
 
+  /**
+   * Play a new hangman game
+   */
   play() {
     clear();
     console.log('\n');
 
-    const randomIdx = Math.floor(Math.random() * hangmanWords.length);
-    [this.word] = hangmanWords.splice(randomIdx, 1);
+    const randomIdx = Math.floor(Math.random() * this.wordList.length);
+    [this.word] = this.wordList.splice(randomIdx, 1);
 
-    this.incorrectGuesses = 0;
-    this.maxIncorrectGuesses = 11;
-    this.guessed = [];
     this.letters = [];
     for (let i = 0, len = this.word.length; i < len; i++) {
       const letter = this.word.charAt(i);
@@ -35,9 +43,19 @@ class HangmanGame {
       }
     }
 
+    this.incorrectGuesses = 0;
+    this.maxIncorrectGuesses = 11;
+    this.guessed = [];
+
     this.displayHangman();
+
+    return this.playPromise;
   }
 
+  /**
+   * Shows the UI for the current stage in the game
+   * Displays hangman image, current state of word, and guess prompt
+   */
   displayHangman() {
     clear();
 
@@ -97,7 +115,7 @@ class HangmanGame {
       if (answer.answer === this.word) {
         this.guessed = [...this.letters];
       } else {
-        console.log(chalk.yellow('\nIncorrect!\n'));
+        console.log(chalk.red('\nINCORRECT! Unlucky, keep going\n'));
         this.incorrectGuesses++;
       }
       this.displayHangman();
@@ -106,14 +124,12 @@ class HangmanGame {
 
   gameWon() {
     UIHelper.showAnswer(this.word);
-    UIHelper.flashWinner()
-      .then(() => PromptHelper.promptNextGame('hangman', () => this.play(), this.promptChooseGame));
+    UIHelper.flashWinner().then(() => this.resolvePlay());
   }
 
   gameLost() {
     console.log(chalk.red('\nGAME OVER!\n'));
-    UIHelper.revealAnswer(this.word)
-      .then(() => PromptHelper.promptNextGame('hangman', () => this.play(), this.promptChooseGame));
+    UIHelper.revealAnswer(this.word).then(() => this.resolvePlay());
   }
 }
 

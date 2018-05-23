@@ -3,6 +3,9 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 
 class UIHelper {
+  /**
+   * Animates flashing 'WINNER' text
+   */
   static flashWinner() {
     return new Promise((resolve) => {
       let counter = 0;
@@ -23,6 +26,10 @@ class UIHelper {
     });
   }
 
+  /**
+   * Animates revealing the answer
+   * This is shown to users when they have lost a game
+   */
   static revealAnswer(answer) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -39,6 +46,9 @@ class UIHelper {
     });
   }
 
+  /**
+   * Animates adding three dots to end of current line
+   */
   static animateEllipsis() {
     return new Promise((resolve) => {
       let count = 0;
