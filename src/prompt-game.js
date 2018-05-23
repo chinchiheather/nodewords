@@ -21,7 +21,8 @@ function promptChooseGame() {
     message: 'Which game would you like to play?',
     choices: [
       { name: 'Hangman', value: 'hangman' },
-      { name: 'Anagram', value: 'anagram' }
+      { name: 'Anagram', value: 'anagram' },
+      { name: 'I\'m done for now, exit Nodewords', value: 'exit' }      
     ]
   }]).then((answer) => {
     switch (answer.gameType) {
@@ -31,6 +32,9 @@ function promptChooseGame() {
 
       case 'hangman':
         hangmanGame.play();
+        break;
+
+      case 'exit':
         break;
 
       default:
