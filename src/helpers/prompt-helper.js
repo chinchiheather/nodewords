@@ -1,5 +1,4 @@
 const inquirer = require('inquirer');
-const promptChooseGame = require('../prompt-game');
 
 class PromptHelper {
   /**

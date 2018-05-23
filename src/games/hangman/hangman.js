@@ -3,8 +3,9 @@ const clear = require('clear');
 const inquirer = require('inquirer');
 const figlet = require('figlet');
 const chalk = require('chalk');
-const UIHelper = require('../utils/ui-helper');
-const PromptHelper = require('../utils/prompt-helper');
+const UIHelper = require('../../helpers/ui-helper');
+const PromptHelper = require('../../helpers/prompt-helper');
+const hangmanStages = require('./hangman-stages');
 
 // todo: use constants here and in anagram for magic strings
 class HangmanGame {
@@ -23,13 +24,16 @@ class HangmanGame {
     // todo: randomly select a word/phrase
     this.phrase = 'add';
     this.count = 0;
-    this.max = 3;
+    this.max = 11;
     this.guessed = [];
     this.displayHangman();
   }
 
   displayHangman() {
-    // todo: show a hangman image
+    clear();
+
+    const hangmanImage = hangmanStages[this.count];
+    console.log(hangmanImage);
 
     let display = '';
     let hasWon = true;

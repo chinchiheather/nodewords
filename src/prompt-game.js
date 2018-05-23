@@ -2,8 +2,8 @@ const figlet = require('figlet');
 const inquirer = require('inquirer');
 const clear = require('clear');
 const chalk = require('chalk');
-const AnagramGame = require('./games/anagram');
-const HangmanGame = require('./games/hangman');
+const AnagramGame = require('./games/anagram/anagram');
+const HangmanGame = require('./games/hangman/hangman');
 
 const anagramGame = new AnagramGame(promptChooseGame);
 const hangmanGame = new HangmanGame(promptChooseGame);

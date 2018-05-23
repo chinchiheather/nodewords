@@ -4,9 +4,9 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const clui = require('clui');
 const logUpdate = require('log-update');
-const anagramList = require('../utils/anagram-list');
-const UIHelper = require('../utils/ui-helper');
-const PromptHelper = require('../utils/prompt-helper');
+const anagramList = require('./anagram-list');
+const UIHelper = require('../../helpers/ui-helper');
+const PromptHelper = require('../../helpers/prompt-helper');
 require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better solution to line
 
 /**
