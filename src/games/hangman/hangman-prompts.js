@@ -4,7 +4,7 @@ const inquirer = require('inquirer');
 function promptForGuess() {
   return inquirer.prompt([{
     type: 'list',
-    name: 'guessOption',
+    name: 'guess',
     message: 'What do you want to do?',
     choices: [
       { name: 'Choose a letter', value: 'letter' },
@@ -14,7 +14,6 @@ function promptForGuess() {
 }
 
 function promptForLetter(guessed) {
-  // todo: disallow multiple letters to be input, non numbers
   return inquirer.prompt([{
     type: 'input',
     name: 'letter',
