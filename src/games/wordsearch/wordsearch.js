@@ -1,9 +1,9 @@
-// todo: use abstract base class Game
-class WordsearchGame {
+const Game = require('../abstract-game');
+
+class WordsearchGame extends Game {
   constructor() {
-    this.playPromise = new Promise((resolve) => {
-      this.resolvePlay = resolve;
-    });
+    super();
+    this.a = 'b';
   }
 
   play() {

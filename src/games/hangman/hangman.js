@@ -1,6 +1,7 @@
 const clear = require('clear');
 const figlet = require('figlet');
 const chalk = require('chalk');
+const Game = require('../abstract-game');
 const UIHelper = require('../../helpers/ui-helper');
 const hangmanStages = require('./hangman-stages');
 const HangmanPrompts = require('./hangman-prompts');
@@ -13,16 +14,14 @@ const hangmanWordList = require('./hangman-word-list');
  */
 
 // todo: use constants here and in anagram for magic strings
-class HangmanGame {
+class HangmanGame extends Game {
   constructor() {
+    super();
     this.guessed = [];
     this.word = null;
     this.incorrectGuesses = 0;
     this.maxIncorrectGuesses = 0;
     this.wordList = [...hangmanWordList];
-    this.playPromise = new Promise((resolve) => {
-      this.resolvePlay = resolve;
-    });
   }
 
   /**

@@ -4,6 +4,7 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const clui = require('clui');
 const logUpdate = require('log-update');
+const Game = require('../abstract-game');
 const anagramWordList = require('./anagram-word-list');
 const UIHelper = require('../../helpers/ui-helper');
 require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better solution to line
@@ -11,8 +12,9 @@ require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better
 /**
  * Anagram game - displays shuffled 9 letter word to user and they have to guess what it is
  */
-class AnagramGame {
+class AnagramGame extends Game {
   constructor() {
+    super();
     this.answerPrompt = null;
     this.answer = null;
     this.countdownInterval = 0;
@@ -20,9 +22,6 @@ class AnagramGame {
     this.total = 0;
     this.current = 0;
     this.wordList = [...anagramWordList];
-    this.playPromise = new Promise((resolve) => {
-      this.resolvePlay = resolve;
-    });
   }
 
   /**
