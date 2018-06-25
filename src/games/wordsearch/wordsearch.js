@@ -1,6 +1,7 @@
 const clear = require('clear');
 const Game = require('../abstract-game');
 const wordList = require('./wordsearch-word-list');
+const letterList = require('./wordsearch-letter-list');
 
 class WordsearchGame extends Game {
   constructor() {
@@ -24,6 +25,7 @@ class WordsearchGame extends Game {
     this.grid = Array(this.gridSize).fill(null);
     this.grid = this.grid.map(() => Array(this.gridSize).fill(''));
 
+    // todo: handle updating other letters if other words push them out
     this.wordList.forEach((word) => {
       const { row, col, isHorizontal } = this.findWordPosition(word);
       if (isHorizontal) {
@@ -37,10 +39,18 @@ class WordsearchGame extends Game {
       }
     });
 
-    console.log(this.grid);
+    // fill in rest of grid with random letters
+    this.grid = this.grid.map(row => row.map((letter) => {
+      if (letter) {
+        return letter;
+      }
+      return letterList[Math.floor(Math.random() * letterList.length)];
+    }));
+
     this.grid.forEach((row) => {
-      process.stdout.write(row.join(' '));
-      process.stdout.write('\r');
+      console.log(row.join(' '));
+    });
+
     });
   }
 

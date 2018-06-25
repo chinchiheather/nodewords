@@ -3,7 +3,7 @@ module.exports = [
   'weak',
   'taste',
   'meow',
-  'puupy',
+  'puppy',
   'holiday',
   'sense',
   'cactus'
