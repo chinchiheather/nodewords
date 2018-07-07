@@ -5,6 +5,8 @@ const letterList = require('./wordsearch-letter-list');
 const readline = require('readline');
 const chalk = require('chalk');
 
+const STARTING_LINE = 5;
+
 class WordsearchGame extends Game {
   constructor() {
     super();
@@ -19,6 +21,7 @@ class WordsearchGame extends Game {
   }
 
   play() {
+    // todo: play in Game calls start game, and returns the playpromise
     this.buildGrid();
     return this.playPromise;
   }
@@ -109,30 +112,27 @@ class WordsearchGame extends Game {
     this.rl.input.on('keypress', (str, key) => {
       switch (key.name) {
         case 'up':
-          readline.moveCursor(process.stdout, 0, -1);
           this.cursorPos.row--;
           break;
         case 'down':
-          readline.moveCursor(process.stdout, 0, 1);
           this.cursorPos.row++;
           break;
         case 'left':
-          readline.moveCursor(process.stdout, -2, 0);
           this.cursorPos.col -= 2;
           break;
         case 'right':
-          readline.moveCursor(process.stdout, 2, 0);
           this.cursorPos.col += 2;
           break;
         case 'space': {
           this.onSpaceKeyPressed();
           break;
         }
-
         default:
           // todo: something
           // this.drawGrid();
       }
+
+      this.setCursorPos();
     });
   }
 
@@ -141,10 +141,8 @@ class WordsearchGame extends Game {
 
     clear();
     console.log('\n');
-    console.log('Find the words in the grid:\n');
-    console.log(this.currentWord);
-    console.log(this.cursorPos);
-
+    console.log('Find the words in the grid');
+    console.log('Use the arrow keys to move around, and the space key to select a letter\n');
 
     this.grid.forEach((row, rowIdx) => {
       const rowData = [];
@@ -169,9 +167,7 @@ class WordsearchGame extends Game {
       console.log(rowStr);
     });
 
-    if (this.cursorPos) {
-      readline.moveCursor(process.stdout, this.cursorPos.col, -(this.gridSize - this.cursorPos.row));
-    }
+    this.setCursorPos();
   }
 
   onSpaceKeyPressed() {
@@ -201,6 +197,10 @@ class WordsearchGame extends Game {
       }
     }
     this.drawGrid();
+  }
+
+  setCursorPos() {
+    readline.cursorTo(process.stdout, this.cursorPos.col, STARTING_LINE + this.cursorPos.row);
   }
 }
 
