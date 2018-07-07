@@ -145,20 +145,27 @@ class WordsearchGame extends Game {
   // allow user to move cursor around the grid
   // when they enter space key, detect if letter is part of a word and if so change colour
   // if any other key, do nothing
-  // todo: prevent them moving outside the grid
   onKeyPress(str, key) {
     switch (key.name) {
       case 'up':
-        this.cursorPos.row--;
+        if (this.cursorPos.row > 0) {
+          this.cursorPos.row--;
+        }
         break;
       case 'down':
-        this.cursorPos.row++;
+        if (this.cursorPos.row < this.gridSize - 1) {
+          this.cursorPos.row++;
+        }
         break;
       case 'left':
-        this.cursorPos.col -= 2;
+        if (this.cursorPos.col > 0) {
+          this.cursorPos.col -= 2;
+        }
         break;
       case 'right':
-        this.cursorPos.col += 2;
+        if (this.cursorPos.col < (this.gridSize - 1) * 2) {
+          this.cursorPos.col += 2;
+        }
         break;
       case 'space': {
         this.onSpaceKeyPressed();
