@@ -25,9 +25,9 @@ class AnagramGame extends Game {
   }
 
   /**
-   * Play a new anagram game
+   * Start a new anagram game
    */
-  play() {
+  startGame() {
     clear();
 
     const randomIdx = Math.floor(Math.random() * this.wordList.length);
@@ -40,8 +40,6 @@ class AnagramGame extends Game {
     console.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
 
     this.startCountdown();
-
-    return this.playPromise;
   }
 
   startCountdown() {

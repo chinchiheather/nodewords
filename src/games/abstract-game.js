@@ -6,7 +6,12 @@ class Game {
   }
 
   play() {
-    console.log('play method should be overridden in child class');
+    this.startGame();
+    return this.playPromise;
+  }
+
+  startGame() {
+    console.log('startGame method should be overridden in child class');
   }
 }
 

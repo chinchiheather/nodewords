@@ -25,9 +25,9 @@ class HangmanGame extends Game {
   }
 
   /**
-   * Play a new hangman game
+   * Start a new hangman game
    */
-  play() {
+  startGame() {
     clear();
     console.log('\n');
 
@@ -47,8 +47,6 @@ class HangmanGame extends Game {
     this.guessed = [];
 
     this.displayHangman();
-
-    return this.playPromise;
   }
 
   /**

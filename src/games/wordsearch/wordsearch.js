@@ -20,10 +20,8 @@ class WordsearchGame extends Game {
     this.guessedWords = [];
   }
 
-  play() {
-    // todo: play in Game calls start game, and returns the playpromise
+  startGame() {
     this.buildGrid();
-    return this.playPromise;
   }
 
   buildGrid() {
