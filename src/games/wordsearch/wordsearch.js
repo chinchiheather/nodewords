@@ -1,9 +1,7 @@
 const clear = require('clear');
-const logUpdate = require('log-update');
 const Game = require('../abstract-game');
 const wordList = require('./wordsearch-word-list');
 const letterList = require('./wordsearch-letter-list');
-const utils = require('readline-utils');
 const readline = require('readline');
 const chalk = require('chalk');
 
@@ -12,7 +10,11 @@ class WordsearchGame extends Game {
     super();
     this.wordList = [...wordList];
     this.gridSize = 15;
-    this.currentWord = null;  // todo: what format should this take?
+    this.currentWord = {
+      id: null,
+      letters: [],
+      selected: []
+    };
   }
 
   play() {
@@ -58,115 +60,8 @@ class WordsearchGame extends Game {
       };
     }));
 
-    // allow user to move cursor around the grid
-    // when they enter space key, detect if letter is part of a word and if so change colour
-    // if any other key, do nothing
-    const cursorPos = [15, 0];
-    this.rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    this.rl.input.on('keypress', (str, key) => {
-      switch (key.name) {
-        case 'up':
-          utils.move(this.rl, key);
-          cursorPos[0]--;
-          break;
-        case 'down':
-          utils.move(this.rl, key);
-          cursorPos[0]++;
-          break;
-        case 'left':
-          utils.move(this.rl, key);
-          cursorPos[1]--;
-          break;
-        case 'right':
-          utils.move(this.rl, key);
-          cursorPos[1]++;
-          break;
-        case 'space': {
-          const row = cursorPos[0];
-          const col = cursorPos[1] * 0.5;
-          this.cursorPos = { col: col * 2, row };
-          if (this.grid[row]) {
-            const item = this.grid[row][col];
-            if (item) {
-              if (item.word) {
-                if (!this.currentWord) {
-                  this.currentWord = {
-                    id: item.word,
-                    current: [],
-                    letters: [] // todo: fill with word letter idxs
-                  };
-                }
-                this.currentWord.current.push(`${row},${col}`);
-              }
-            }
-          }
-          this.drawGrid();
-          break;
-        }
-
-        default:
-          // this.drawGrid();
-      }
-    });
-
+    this.setupReadline();
     this.drawGrid();
-  }
-
-  drawGrid() {
-    clear();
-    console.log('\n');
-    console.log('Find the words in the grid:\n');
-    console.log(this.currentWord);
-    console.log(this.cursorPos);
-    // console.log(this.currentWord.current);
-
-    this.grid.forEach((row, rowIdx) => {
-      const rowData = [];
-      row.forEach((item, itemIdx) => {
-        if (this.currentWord && item.word === this.currentWord.id && this.currentWord.current && this.currentWord.current.indexOf(`${rowIdx},${itemIdx}`) !== -1) {
-          rowData.push(chalk.green(item.letter));
-        } else {
-          rowData.push(item.letter);
-        }
-      });
-      let rowStr = rowData.join(' ');
-      if (this.wordList[rowIdx]) {
-        rowStr += '       ';
-        rowStr += this.wordList[rowIdx];
-      }
-      console.log(rowStr);
-    });
-    if (this.cursorPos) {
-      // utils.right(this.rl, this.cursorPos.cols);
-      // utils.up(this.rl, this.cursorPos.rows);
-      // setInterval(() => {
-      //   console.log('moving up')
-      //   utils.move(this.rl, 'up');
-      // }, 100)
-      // utils.move(this.rl, 'up');
-      // utils.move(this.rl, 'up');
-      readline.moveCursor(process.stdout, this.cursorPos.col, -(this.gridSize - this.cursorPos.row));
-    }
-
-    // todo: need a separate draw function to run after each go
-    // need an array just for letter order?
-    // need to store words, their idxs and whether user has guessed them in another array
-
-    // const this.rl = readline.createInterface({
-    //   input: process.stdin,
-    //   output: process.stdout
-    // });
-    // this.rl.input.on('keypress', function(s, key) {
-    //   if( key.name === "up") {
-    //     readline.moveCursor(process.stdin, 0, 0);
-    //   } else if( key.name === "down"){
-    //   } else if (key.name !== 'a') {
-    //     return; // don't render if nothing changed
-    //   }
-    // })
   }
 
   // todo: this algorithm can be improved
@@ -198,6 +93,96 @@ class WordsearchGame extends Game {
       return this.findWordPosition(word);
     }
     return { row, col, isHorizontal };
+  }
+
+  setupReadline() {
+    this.rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    this.cursorPos = { col: 0, row: 15 };
+    // allow user to move cursor around the grid
+    // when they enter space key, detect if letter is part of a word and if so change colour
+    // if any other key, do nothing
+    this.rl.input.on('keypress', (str, key) => {
+      switch (key.name) {
+        case 'up':
+          readline.moveCursor(process.stdout, 0, -1);
+          this.cursorPos.row--;
+          break;
+        case 'down':
+          readline.moveCursor(process.stdout, 0, 1);
+          this.cursorPos.row++;
+          break;
+        case 'left':
+          readline.moveCursor(process.stdout, -1, 0);
+          this.cursorPos.col--;
+          break;
+        case 'right':
+          readline.moveCursor(process.stdout, 1, 0);
+          this.cursorPos.col++;
+          break;
+        case 'space': {
+          this.onSpaceKeyPressed();
+          break;
+        }
+
+        default:
+          // todo: something
+          // this.drawGrid();
+      }
+    });
+  }
+
+  drawGrid() {
+    const { id, selected } = this.currentWord;
+
+    clear();
+    console.log('\n');
+    console.log('Find the words in the grid:\n');
+    console.log(this.currentWord);
+    console.log(this.cursorPos);
+
+
+    this.grid.forEach((row, rowIdx) => {
+      const rowData = [];
+      row.forEach((item, itemIdx) => {
+        if (item.word === id && selected.indexOf(`${rowIdx},${itemIdx}`) !== -1) {
+          rowData.push(chalk.green(item.letter));
+        } else {
+          rowData.push(item.letter);
+        }
+      });
+      let rowStr = rowData.join(' ');
+      if (this.wordList[rowIdx]) {
+        rowStr += '       ';
+        rowStr += this.wordList[rowIdx];
+      }
+      console.log(rowStr);
+    });
+
+    if (this.cursorPos) {
+      readline.moveCursor(process.stdout, this.cursorPos.col, -(this.gridSize - this.cursorPos.row));
+    }
+  }
+
+  onSpaceKeyPressed() {
+    const { row } = this.cursorPos;
+    const col = this.cursorPos.col * 0.5;
+    if (this.grid[row]) {
+      const item = this.grid[row][col];
+      if (item && item.word != null) {
+        if (this.currentWord.id !== item.word) {
+          this.currentWord = {
+            id: item.word,
+            letters: [], // todo: fill with word letter idxs
+            selected: []
+          };
+        }
+        this.currentWord.selected.push(`${row},${col}`);
+      }
+    }
+    this.drawGrid();
   }
 }
 
