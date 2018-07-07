@@ -15,6 +15,7 @@ class WordsearchGame extends Game {
       letters: [],
       selected: []
     };
+    this.guessedWords = [];
   }
 
   play() {
@@ -104,6 +105,7 @@ class WordsearchGame extends Game {
     // allow user to move cursor around the grid
     // when they enter space key, detect if letter is part of a word and if so change colour
     // if any other key, do nothing
+    // todo: prevent them moving outside the grid
     this.rl.input.on('keypress', (str, key) => {
       switch (key.name) {
         case 'up':
@@ -115,12 +117,12 @@ class WordsearchGame extends Game {
           this.cursorPos.row++;
           break;
         case 'left':
-          readline.moveCursor(process.stdout, -1, 0);
-          this.cursorPos.col--;
+          readline.moveCursor(process.stdout, -2, 0);
+          this.cursorPos.col -= 2;
           break;
         case 'right':
-          readline.moveCursor(process.stdout, 1, 0);
-          this.cursorPos.col++;
+          readline.moveCursor(process.stdout, 2, 0);
+          this.cursorPos.col += 2;
           break;
         case 'space': {
           this.onSpaceKeyPressed();
@@ -147,8 +149,10 @@ class WordsearchGame extends Game {
     this.grid.forEach((row, rowIdx) => {
       const rowData = [];
       row.forEach((item, itemIdx) => {
-        if (item.word === id && selected.indexOf(`${rowIdx},${itemIdx}`) !== -1) {
+        if (this.guessedWords.indexOf(item.word) !== -1) {
           rowData.push(chalk.green(item.letter));
+        } else if (item.word === id && selected.indexOf(`${rowIdx},${itemIdx}`) !== -1) {
+          rowData.push(chalk.black.bgGreen(item.letter));
         } else {
           rowData.push(item.letter);
         }
@@ -156,7 +160,11 @@ class WordsearchGame extends Game {
       let rowStr = rowData.join(' ');
       if (this.wordList[rowIdx]) {
         rowStr += '       ';
-        rowStr += this.wordList[rowIdx];
+        let word = this.wordList[rowIdx];
+        if (this.guessedWords.indexOf(rowIdx) !== -1) {
+          word = chalk.green(word);
+        }
+        rowStr += word;
       }
       console.log(rowStr);
     });
@@ -169,17 +177,27 @@ class WordsearchGame extends Game {
   onSpaceKeyPressed() {
     const { row } = this.cursorPos;
     const col = this.cursorPos.col * 0.5;
+    const { id: currentWordId } = this.currentWord;
+
     if (this.grid[row]) {
       const item = this.grid[row][col];
       if (item && item.word != null) {
-        if (this.currentWord.id !== item.word) {
+        if (currentWordId !== item.word) {
           this.currentWord = {
             id: item.word,
-            letters: [], // todo: fill with word letter idxs
+            letters: this.wordList[item.word].split(''),
             selected: []
           };
         }
-        this.currentWord.selected.push(`${row},${col}`);
+
+        const { selected, letters } = this.currentWord;
+        const pos = `${row},${col}`;
+        if (selected.indexOf(pos) === -1) {
+          selected.push(pos);
+          if (selected.length === letters.length) {
+            this.guessedWords.push(currentWordId);
+          }
+        }
       }
     }
     this.drawGrid();
