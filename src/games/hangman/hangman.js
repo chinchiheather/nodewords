@@ -2,7 +2,6 @@ const clear = require('clear');
 const figlet = require('figlet');
 const chalk = require('chalk');
 const Game = require('../abstract-game');
-const UIHelper = require('../../helpers/ui-helper');
 const hangmanStages = require('./hangman-stages');
 const HangmanPrompts = require('./hangman-prompts');
 const hangmanWordList = require('./hangman-word-list');
@@ -74,9 +73,9 @@ class HangmanGame extends Game {
     }
 
     if (hasWon) {
-      this.gameWon();
+      this.gameWon(this.word);
     } else if (this.incorrectGuesses === this.maxIncorrectGuesses) {
-      this.gameLost();
+      this.gameLost(this.word);
     } else {
       console.log('Solve the hangman puzzle:\n');
       console.log(figlet.textSync(display, { font: 'Cybermedium' }));
@@ -117,16 +116,6 @@ class HangmanGame extends Game {
       }
       this.displayHangman();
     });
-  }
-
-  gameWon() {
-    UIHelper.showAnswer(this.word);
-    UIHelper.flashWinner().then(() => this.resolvePlay());
-  }
-
-  gameLost() {
-    console.log(chalk.red('\nGAME OVER!\n'));
-    UIHelper.revealAnswer(this.word).then(() => this.resolvePlay());
   }
 }
 

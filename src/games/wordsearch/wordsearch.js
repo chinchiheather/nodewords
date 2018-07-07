@@ -1,9 +1,9 @@
 const clear = require('clear');
+const readline = require('readline');
+const chalk = require('chalk');
 const Game = require('../abstract-game');
 const wordList = require('./wordsearch-word-list');
 const letterList = require('./wordsearch-letter-list');
-const readline = require('readline');
-const chalk = require('chalk');
 
 const STARTING_LINE = 5;
 
@@ -18,6 +18,8 @@ class WordsearchGame extends Game {
       selected: []
     };
     this.guessedWords = [];
+
+    this.onKeyPress = this.onKeyPress.bind(this);
   }
 
   startGame() {
@@ -102,36 +104,8 @@ class WordsearchGame extends Game {
       input: process.stdin,
       output: process.stdout
     });
-    this.cursorPos = { col: 0, row: 15 };
-    // allow user to move cursor around the grid
-    // when they enter space key, detect if letter is part of a word and if so change colour
-    // if any other key, do nothing
-    // todo: prevent them moving outside the grid
-    this.rl.input.on('keypress', (str, key) => {
-      switch (key.name) {
-        case 'up':
-          this.cursorPos.row--;
-          break;
-        case 'down':
-          this.cursorPos.row++;
-          break;
-        case 'left':
-          this.cursorPos.col -= 2;
-          break;
-        case 'right':
-          this.cursorPos.col += 2;
-          break;
-        case 'space': {
-          this.onSpaceKeyPressed();
-          break;
-        }
-        default:
-          // todo: something
-          // this.drawGrid();
-      }
-
-      this.setCursorPos();
-    });
+    this.cursorPos = { col: 0, row: this.gridSize };
+    this.rl.input.on('keypress', this.onKeyPress);
   }
 
   drawGrid() {
@@ -168,6 +142,36 @@ class WordsearchGame extends Game {
     this.setCursorPos();
   }
 
+  // allow user to move cursor around the grid
+  // when they enter space key, detect if letter is part of a word and if so change colour
+  // if any other key, do nothing
+  // todo: prevent them moving outside the grid
+  onKeyPress(str, key) {
+    switch (key.name) {
+      case 'up':
+        this.cursorPos.row--;
+        break;
+      case 'down':
+        this.cursorPos.row++;
+        break;
+      case 'left':
+        this.cursorPos.col -= 2;
+        break;
+      case 'right':
+        this.cursorPos.col += 2;
+        break;
+      case 'space': {
+        this.onSpaceKeyPressed();
+        break;
+      }
+      default:
+        // todo: something
+        // this.drawGrid();
+    }
+
+    this.setCursorPos();
+  }
+
   onSpaceKeyPressed() {
     const { row } = this.cursorPos;
     const col = this.cursorPos.col * 0.5;
@@ -190,6 +194,10 @@ class WordsearchGame extends Game {
           selected.push(pos);
           if (selected.length === letters.length) {
             this.guessedWords.push(currentWordId);
+            if (this.guessedWords.length === this.wordList.length) {
+              this.cursorPos = { col: 0, row: this.gridSize + 2 };
+              this.gameWon();
+            }
           }
         }
       }
@@ -199,6 +207,14 @@ class WordsearchGame extends Game {
 
   setCursorPos() {
     readline.cursorTo(process.stdout, this.cursorPos.col, STARTING_LINE + this.cursorPos.row);
+  }
+
+  gameWon() {
+    if (this.rl) {
+      this.rl.input.removeListener('keypress', this.onKeyPress);
+      this.rl.close();
+    }
+    super.gameWon();
   }
 }
 

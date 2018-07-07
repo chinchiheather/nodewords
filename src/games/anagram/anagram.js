@@ -6,7 +6,6 @@ const clui = require('clui');
 const logUpdate = require('log-update');
 const Game = require('../abstract-game');
 const anagramWordList = require('./anagram-word-list');
-const UIHelper = require('../../helpers/ui-helper');
 require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better solution to line
 
 /**
@@ -115,14 +114,12 @@ class AnagramGame extends Game {
   gameWon() {
     this.stopCountdown();
     this.finishGame();
-    UIHelper.showAnswer(this.answer);
-    UIHelper.flashWinner().then(() => this.resolvePlay());
+    super.gameWon(this.answer);
   }
 
   gameLost() {
     this.finishGame();
-    console.log(chalk.red('\nTIME\'S UP!\n'));
-    UIHelper.revealAnswer(this.answer).then(() => this.resolvePlay());
+    super.gameLost(this.answer, '\nTIME\'S UP!\n');
   }
 
   finishGame() {
