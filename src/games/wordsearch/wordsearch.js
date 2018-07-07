@@ -172,8 +172,9 @@ class WordsearchGame extends Game {
         break;
       }
       default:
-        // todo: something
-        // this.drawGrid();
+        if (!(key.ctrl && key.name === 'c')) {
+          this.drawGrid();
+        }
     }
 
     this.setCursorPos();
