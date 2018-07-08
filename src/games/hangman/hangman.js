@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const Game = require('../abstract-game');
 const hangmanStages = require('./hangman-stages');
 const HangmanPrompts = require('./hangman-prompts');
-const hangmanWordList = require('./hangman-word-list');
+const wordList = require('../word-list');
 
 /**
  * Hangman game - displays letter placeholders to user and they guess
@@ -20,7 +20,7 @@ class HangmanGame extends Game {
     this.word = null;
     this.incorrectGuesses = 0;
     this.maxIncorrectGuesses = 0;
-    this.wordList = [...hangmanWordList];
+    this.hangmanWordList = [...wordList];
   }
 
   /**
@@ -30,8 +30,8 @@ class HangmanGame extends Game {
     clear();
     console.log('\n');
 
-    const randomIdx = Math.floor(Math.random() * this.wordList.length);
-    [this.word] = this.wordList.splice(randomIdx, 1);
+    const randomIdx = Math.floor(Math.random() * this.hangmanWordList.length);
+    [this.word] = this.hangmanWordList.splice(randomIdx, 1);
 
     this.letters = [];
     for (let i = 0, len = this.word.length; i < len; i++) {

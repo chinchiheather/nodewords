@@ -2,7 +2,7 @@ const clear = require('clear');
 const readline = require('readline');
 const chalk = require('chalk');
 const Game = require('../abstract-game');
-const wordList = require('./wordsearch-word-list');
+const wordList = require('../word-list');
 const letterList = require('./wordsearch-letter-list');
 
 const STARTING_LINE = 5;
@@ -10,7 +10,6 @@ const STARTING_LINE = 5;
 class WordsearchGame extends Game {
   constructor() {
     super();
-    this.wordList = [...wordList];
     this.gridSize = 15;
     this.currentWord = {
       id: null,
@@ -23,6 +22,11 @@ class WordsearchGame extends Game {
   }
 
   startGame() {
+    this.wordsearchWordList = [];
+    for (let i = 0; i < this.gridSize; i++) {
+      const randomIdx = Math.floor(Math.random() * wordList.length);
+      this.wordsearchWordList.push(wordList[randomIdx]);
+    }
     this.buildGrid();
   }
 
@@ -34,7 +38,7 @@ class WordsearchGame extends Game {
     }));
 
     // todo: handle updating other letters if other words push them out
-    this.wordList.forEach((word, wordIdx) => {
+    this.wordsearchWordList.forEach((word, wordIdx) => {
       const { row, col, isHorizontal } = this.findWordPosition(word);
       if (isHorizontal) {
         for (let i = 0, len = word.length; i < len; i++) {
@@ -128,9 +132,9 @@ class WordsearchGame extends Game {
         }
       });
       let rowStr = rowData.join(' ');
-      if (this.wordList[rowIdx]) {
+      if (this.wordsearchWordList[rowIdx]) {
         rowStr += '       ';
-        let word = this.wordList[rowIdx];
+        let word = this.wordsearchWordList[rowIdx];
         if (this.guessedWords.indexOf(rowIdx) !== -1) {
           word = chalk.green(word);
         }
@@ -191,7 +195,7 @@ class WordsearchGame extends Game {
         if (currentWordId !== item.word) {
           this.currentWord = {
             id: item.word,
-            letters: this.wordList[item.word].split(''),
+            letters: this.wordsearchWordList[item.word].split(''),
             selected: []
           };
         }
@@ -202,7 +206,7 @@ class WordsearchGame extends Game {
           selected.push(pos);
           if (selected.length === letters.length) {
             this.guessedWords.push(currentWordId);
-            if (this.guessedWords.length === this.wordList.length) {
+            if (this.guessedWords.length === this.wordsearchWordList.length) {
               this.cursorPos = { col: 0, row: this.gridSize + 2 };
               this.gameWon();
             }
