@@ -54,6 +54,7 @@ class HangmanGame extends Game {
    */
   displayHangman() {
     clear();
+    console.log(figlet.textSync('HANGMAN', { font: 'Mini' }));
 
     const hangmanImage = hangmanStages[this.incorrectGuesses];
     console.log(hangmanImage);

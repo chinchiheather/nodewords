@@ -1,11 +1,12 @@
 const clear = require('clear');
 const readline = require('readline');
 const chalk = require('chalk');
+const figlet = require('figlet');
 const Game = require('../abstract-game');
 const wordList = require('../word-list');
 const letterList = require('./wordsearch-letter-list');
 
-const STARTING_LINE = 5;
+const STARTING_LINE = 7;
 
 class WordsearchGame extends Game {
   constructor() {
@@ -37,7 +38,6 @@ class WordsearchGame extends Game {
       word: null
     }));
 
-    // todo: handle updating other letters if other words push them out
     this.wordsearchWordList.forEach((word, wordIdx) => {
       const { row, col, isHorizontal } = this.findWordPosition(word);
       if (isHorizontal) {
@@ -116,7 +116,7 @@ class WordsearchGame extends Game {
     const { id, selected } = this.currentWord;
 
     clear();
-    console.log('\n');
+    console.log(figlet.textSync('WORDSEARCH', { font: 'Mini' }));
     console.log('Find the words in the grid');
     console.log(chalk.grey('(Use the arrow keys to move around, and the space key to select a letter)\n'));
 

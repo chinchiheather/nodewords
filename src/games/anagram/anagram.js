@@ -34,7 +34,7 @@ class AnagramGame extends Game {
     const shuffledWord = Object.keys(word)[0];
     this.answer = word[shuffledWord];
 
-    console.log('\n\n\n');
+    console.log(figlet.textSync('ANAGRAM', { font: 'Mini' }));
     console.log('Solve the anagram:');
     console.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
 
