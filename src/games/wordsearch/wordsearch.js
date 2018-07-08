@@ -118,7 +118,7 @@ class WordsearchGame extends Game {
     clear();
     console.log('\n');
     console.log('Find the words in the grid');
-    console.log('Use the arrow keys to move around, and the space key to select a letter\n');
+    console.log(chalk.grey('(Use the arrow keys to move around, and the space key to select a letter)\n'));
 
     this.grid.forEach((row, rowIdx) => {
       const rowData = [];
