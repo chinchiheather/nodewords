@@ -6,9 +6,11 @@ class GamePrompts {
       type: 'list',
       name: 'gameType',
       message: 'Which game would you like to play?',
+      // todo: use constants for game types
       choices: [
         { name: 'Anagram', value: 'anagram' },
         { name: 'Hangman', value: 'hangman' },
+        { name: 'Wordsearch', value: 'wordsearch' },
         { name: 'I\'m done for now, exit Nodewords', value: 'exit' }
       ]
     }]);

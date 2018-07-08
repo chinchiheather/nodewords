@@ -3,6 +3,7 @@ const clear = require('clear');
 const figlet = require('figlet');
 const AnagramGame = require('./games/anagram/anagram');
 const HangmanGame = require('./games/hangman/hangman');
+const WordsearchGame = require('./games/wordsearch/wordsearch');
 const GamePrompts = require('./game-prompts');
 
 class GameController {
@@ -21,6 +22,10 @@ class GameController {
 
         case 'hangman':
           this.playHangman();
+          break;
+
+        case 'wordsearch':
+          this.playWordsearch();
           break;
 
         case 'exit': break;
@@ -74,6 +79,13 @@ class GameController {
     const hangmanGame = new HangmanGame();
     hangmanGame.play().then(() => {
       this.pickNextGame('hangman', () => this.playHangman());
+    });
+  }
+
+  playWordsearch() {
+    const wordsearchGame = new WordsearchGame();
+    wordsearchGame.play().then(() => {
+      this.pickNextGame('wordsearch', () => this.playWordsearch());
     });
   }
 }

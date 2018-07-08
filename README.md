@@ -21,3 +21,6 @@ nodewords
 
 * Hangman
   ![hangman](https://chinchiheather.github.io/nodewords/img/hangman-example.png)
+
+* Wordsearch
+  ![wordsearch](https://chinchiheather.github.io/nodewords/img/wordsearch-example.png)

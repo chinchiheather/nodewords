@@ -4,15 +4,16 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const clui = require('clui');
 const logUpdate = require('log-update');
+const Game = require('../abstract-game');
 const anagramWordList = require('./anagram-word-list');
-const UIHelper = require('../../helpers/ui-helper');
 require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better solution to line
 
 /**
  * Anagram game - displays shuffled 9 letter word to user and they have to guess what it is
  */
-class AnagramGame {
+class AnagramGame extends Game {
   constructor() {
+    super();
     this.answerPrompt = null;
     this.answer = null;
     this.countdownInterval = 0;
@@ -20,15 +21,12 @@ class AnagramGame {
     this.total = 0;
     this.current = 0;
     this.wordList = [...anagramWordList];
-    this.playPromise = new Promise((resolve) => {
-      this.resolvePlay = resolve;
-    });
   }
 
   /**
-   * Play a new anagram game
+   * Start a new anagram game
    */
-  play() {
+  startGame() {
     clear();
 
     const randomIdx = Math.floor(Math.random() * this.wordList.length);
@@ -36,13 +34,11 @@ class AnagramGame {
     const shuffledWord = Object.keys(word)[0];
     this.answer = word[shuffledWord];
 
-    console.log('\n\n\n');
+    console.log(figlet.textSync('ANAGRAM', { font: 'Mini' }));
     console.log('Solve the anagram:');
     console.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
 
     this.startCountdown();
-
-    return this.playPromise;
   }
 
   startCountdown() {
@@ -118,14 +114,12 @@ class AnagramGame {
   gameWon() {
     this.stopCountdown();
     this.finishGame();
-    UIHelper.showAnswer(this.answer);
-    UIHelper.flashWinner().then(() => this.resolvePlay());
+    super.gameWon(this.answer);
   }
 
   gameLost() {
     this.finishGame();
-    console.log(chalk.red('\nTIME\'S UP!\n'));
-    UIHelper.revealAnswer(this.answer).then(() => this.resolvePlay());
+    super.gameLost(this.answer, '\nTIME\'S UP!\n');
   }
 
   finishGame() {

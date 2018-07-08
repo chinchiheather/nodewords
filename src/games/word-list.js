@@ -849,8 +849,5 @@ module.exports = [
   'yes',
   'yesterday',
   'you',
-  'young',
-  'Bernhard',
-  'Breytenbach',
-  'Android'
+  'young'
 ];

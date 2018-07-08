@@ -1,10 +1,10 @@
 const clear = require('clear');
 const figlet = require('figlet');
 const chalk = require('chalk');
-const UIHelper = require('../../helpers/ui-helper');
+const Game = require('../abstract-game');
 const hangmanStages = require('./hangman-stages');
 const HangmanPrompts = require('./hangman-prompts');
-const hangmanWordList = require('./hangman-word-list');
+const wordList = require('../word-list');
 
 /**
  * Hangman game - displays letter placeholders to user and they guess
@@ -13,27 +13,25 @@ const hangmanWordList = require('./hangman-word-list');
  */
 
 // todo: use constants here and in anagram for magic strings
-class HangmanGame {
+class HangmanGame extends Game {
   constructor() {
+    super();
     this.guessed = [];
     this.word = null;
     this.incorrectGuesses = 0;
     this.maxIncorrectGuesses = 0;
-    this.wordList = [...hangmanWordList];
-    this.playPromise = new Promise((resolve) => {
-      this.resolvePlay = resolve;
-    });
+    this.hangmanWordList = [...wordList];
   }
 
   /**
-   * Play a new hangman game
+   * Start a new hangman game
    */
-  play() {
+  startGame() {
     clear();
     console.log('\n');
 
-    const randomIdx = Math.floor(Math.random() * this.wordList.length);
-    [this.word] = this.wordList.splice(randomIdx, 1);
+    const randomIdx = Math.floor(Math.random() * this.hangmanWordList.length);
+    [this.word] = this.hangmanWordList.splice(randomIdx, 1);
 
     this.letters = [];
     for (let i = 0, len = this.word.length; i < len; i++) {
@@ -48,8 +46,6 @@ class HangmanGame {
     this.guessed = [];
 
     this.displayHangman();
-
-    return this.playPromise;
   }
 
   /**
@@ -58,6 +54,7 @@ class HangmanGame {
    */
   displayHangman() {
     clear();
+    console.log(figlet.textSync('HANGMAN', { font: 'Mini' }));
 
     const hangmanImage = hangmanStages[this.incorrectGuesses];
     console.log(hangmanImage);
@@ -77,9 +74,9 @@ class HangmanGame {
     }
 
     if (hasWon) {
-      this.gameWon();
+      this.gameWon(this.word);
     } else if (this.incorrectGuesses === this.maxIncorrectGuesses) {
-      this.gameLost();
+      this.gameLost(this.word);
     } else {
       console.log('Solve the hangman puzzle:\n');
       console.log(figlet.textSync(display, { font: 'Cybermedium' }));
@@ -120,16 +117,6 @@ class HangmanGame {
       }
       this.displayHangman();
     });
-  }
-
-  gameWon() {
-    UIHelper.showAnswer(this.word);
-    UIHelper.flashWinner().then(() => this.resolvePlay());
-  }
-
-  gameLost() {
-    console.log(chalk.red('\nGAME OVER!\n'));
-    UIHelper.revealAnswer(this.word).then(() => this.resolvePlay());
   }
 }
 
