@@ -77,7 +77,6 @@ class WordsearchGame extends Game {
   /**
    * Finds a place in the grid where the word will fit that isn't already used by
    * another word
-   * todo: improve the algorithm
    */
   findWordPosition(word) {
     // choose horizontal or vertical
