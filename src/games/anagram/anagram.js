@@ -3,10 +3,13 @@ const clear = require('clear');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const clui = require('clui');
-const logUpdate = require('log-update');
+const readline = require('readline');
 const Game = require('../abstract-game');
 const anagramWordList = require('./anagram-word-list');
-require('events').EventEmitter.defaultMaxListeners = 100; // todo: find a better solution to line
+require('events').EventEmitter.defaultMaxListeners = 100;
+
+const TOTAL_SECONDS = 30;
+const STARTING_LINE = 10;
 
 /**
  * Anagram game - displays shuffled 9 letter word to user and they have to guess what it is
@@ -34,16 +37,22 @@ class AnagramGame extends Game {
     const shuffledWord = Object.keys(word)[0];
     this.answer = word[shuffledWord];
 
-    console.log(figlet.textSync('ANAGRAM', { font: 'Mini' }));
-    console.log('Solve the anagram:');
-    console.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
+    this.rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    this.logger.log(figlet.textSync('ANAGRAM', { font: 'Mini' }));
+    this.logger.log('Solve the anagram:');
+    this.logger.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
 
     this.startCountdown();
   }
 
   startCountdown() {
-    this.total = 30;
+    this.total = TOTAL_SECONDS;
     this.current = this.total;
+    this.logger.log('\n');
     this.displayProgressAndPrompt();
     this.resumeCountdown();
   }
@@ -61,13 +70,15 @@ class AnagramGame extends Game {
 
   stopCountdown() {
     clearInterval(this.countdownInterval);
+    this.clearAll();
   }
 
   /**
    * Display current timer status in gauge and prompt for user's answer
    */
   displayProgressAndPrompt() {
-    logUpdate(clui.Gauge(this.current, this.total, this.total + 1, this.total, `${this.current}s`));
+    this.clearAll();
+    this.logger.log(clui.Gauge(this.current, this.total, this.total + 1, this.total, `${this.current}s`));
     this.promptForAnswer();
   }
 
@@ -95,7 +106,7 @@ class AnagramGame extends Game {
         } else {
           this.incorrectGuess = true;
           this.stopCountdown();
-          logUpdate(chalk.red('INCORRECT! Unlucky, guess again'));
+          this.logger.write(chalk.red('INCORRECT! Unlucky, guess again'));
           this.resumeCountdown();
         }
       });
@@ -111,6 +122,38 @@ class AnagramGame extends Game {
     }
   }
 
+  /**
+   * Clear current line of console
+   */
+  clearLine() {
+    readline.clearLine(process.stdin, 0);
+  }
+
+  /**
+   * Clears answer prompt and progress bar lines
+   * Cursor ends up at start of progress bar line
+   */
+  clearAll() {
+    this.moveCursorToAnswerPrompt();
+    this.clearLine();
+    this.moveCursorToProgressBar();
+    this.clearLine();
+  }
+
+  /**
+   * Moves cursor to the start of the line that is displaying the progress bar timer
+   */
+  moveCursorToProgressBar() {
+    readline.cursorTo(process.stdin, 0, STARTING_LINE);
+  }
+
+  /**
+   * Moves cursor to the start of the line that is prompting user for answer
+   */
+  moveCursorToAnswerPrompt() {
+    readline.cursorTo(process.stdin, 0, STARTING_LINE + 1);
+  }
+
   gameWon() {
     this.stopCountdown();
     this.finishGame();
@@ -123,7 +166,6 @@ class AnagramGame extends Game {
   }
 
   finishGame() {
-    logUpdate.clear();
     this.answerPrompt.ui.close();
     this.answerPrompt = null;
   }

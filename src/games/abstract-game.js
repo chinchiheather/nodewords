@@ -1,8 +1,10 @@
 const chalk = require('chalk');
 const UIHelper = require('../helpers/ui-helper');
+const Logger = require('../helpers/logger');
 
 class Game {
   constructor() {
+    this.logger = new Logger();
     this.playPromise = new Promise((resolve) => {
       this.resolvePlay = resolve;
     });
