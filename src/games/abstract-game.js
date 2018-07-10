@@ -16,7 +16,7 @@ class Game {
   }
 
   startGame() {
-    console.log('startGame method should be overridden in subclass');
+    throw Error('startGame method should be overridden in subclass');
   }
 
   gameWon(answer) {
@@ -27,7 +27,7 @@ class Game {
   }
 
   gameLost(answer, message = '\nGAME OVER!\n') {
-    console.log(chalk.red(message));
+    this.logger.log(chalk.red(message));
     UIHelper.revealAnswer(answer).then(() => this.resolvePlay());
   }
 }
