@@ -2,6 +2,8 @@
 /* eslint-env jest */
 /* eslint-disable no-return-assign, global-require */
 
+const anagramConstants = require('../anagram-constants');
+
 describe('Anagram', () => {
   let anagramGame;
 
@@ -17,14 +19,17 @@ describe('Anagram', () => {
   let revealAnswerSpy;
   let readlineMock;
   let chalkMock;
+  let promptCallback;
   let word;
   let shuffled;
-
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
+  let showAnswerSpy;
+  let flashWinnerSpy;
+  let flashWinnerCallback;
+  let playResolved;
 
   beforeEach(() => {
+    jest.useFakeTimers();
+
     // todo: centralise some of this mocking so other files can use them
     // todo: use promise spy helper?
     jest.mock('clear', () => clearSpy = jest.fn());
@@ -38,7 +43,7 @@ describe('Anagram', () => {
     }));
     jest.mock('inquirer', () => ({
       prompt: promptSpy = jest.fn(() => ({
-        then: () => null,
+        then: jest.fn((callback) => { promptCallback = callback; }),
         ui: {
           rl: {
             on: () => null
@@ -68,6 +73,10 @@ describe('Anagram', () => {
         return {
           revealAnswer: revealAnswerSpy = jest.fn(() => ({
             then: () => null
+          })),
+          showAnswer: showAnswerSpy = jest.fn(),
+          flashWinner: flashWinnerSpy = jest.fn(() => ({
+            then: (callback) => { flashWinnerCallback = callback; }
           }))
         };
       });
@@ -79,7 +88,7 @@ describe('Anagram', () => {
 
     const AnagramGame = require('../anagram');
     anagramGame = new AnagramGame();
-    anagramGame.play();
+    anagramGame.play().then(() => { playResolved = true; });
 
     [word] = mockWordList;
     [shuffled] = Object.keys(word);
@@ -103,8 +112,9 @@ describe('Anagram', () => {
       expect(anagramGame.answer).toBe(expected);
     });
 
-    it('displays game title', () => {
-      expect(logSpy).toHaveBeenCalledWith('ANAGRAM');
+    it('displays game title and info', () => {
+      expect(logSpy).toHaveBeenCalledWith(anagramConstants.GAME_TITLE);
+      expect(logSpy).toHaveBeenCalledWith(anagramConstants.GAME_INFO);
     });
 
     it('displays anagram to solve', () => {
@@ -178,10 +188,77 @@ describe('Anagram', () => {
         expect(uiCloseSpy).toHaveBeenCalled();
       });
 
-      it('shows user losing message', () => {
-        expect(chalkMock.red).toHaveBeenCalledWith('\nTIME\'S UP!\n');
-        expect(logSpy).toHaveBeenCalledWith('\nTIME\'S UP!\n');
+      it('shows user losing message in red', () => {
+        expect(chalkMock.red).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
+        expect(logSpy).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
         expect(revealAnswerSpy).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('User inputs an answer', () => {
+    describe('and answer is incorrect', () => {
+      beforeEach(() => {
+        setInterval.mockReset();
+        promptCallback({ solution: 'incorrect guess' });
+      });
+
+      it('stops countdown temporarily', () => {
+        expect(clearInterval).toHaveBeenCalled();
+      });
+
+      it('shows user incorrect guess message in red', () => {
+        expect(chalkMock.red).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
+        expect(writeSpy).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
+      });
+
+      it('resumes countdown after 1s', () => {
+        jest.advanceTimersByTime(1000);
+        expect(setInterval).toHaveBeenCalled();
+      });
+
+      it('removes incorrect guess message after 1s', () => {
+        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
+        expect(readlineMock.clearLine).toHaveBeenCalled();
+      });
+    });
+
+    describe('and answer is correct', () => {
+      beforeEach(() => {
+        promptCallback({ solution: 'ripples' });
+      });
+
+      it('stops countdown', () => {
+        expect(clearInterval).toHaveBeenCalled();
+      });
+
+      it('stops showing progress bar', () => {
+        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
+        expect(readlineMock.clearLine).toHaveBeenCalled();
+      });
+
+      it('stops showing answer prompt', () => {
+        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 11);
+        expect(readlineMock.clearLine).toHaveBeenCalled();
+
+        expect(uiCloseSpy).toHaveBeenCalled();
+      });
+
+      it('shows user answer in green', () => {
+        expect(showAnswerSpy).toHaveBeenCalledWith('ripples');
+      });
+
+      it('shows user winner message', () => {
+        expect(flashWinnerSpy).toHaveBeenCalled();
+      });
+
+      it('resolves promise from play() finished showing winning message', (done) => {
+        flashWinnerCallback();
+        jest.useRealTimers();
+        setTimeout(() => {
+          expect(playResolved).toBe(true);
+          done();
+        }, 10);
       });
     });
   });

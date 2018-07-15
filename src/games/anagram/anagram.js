@@ -6,10 +6,8 @@ const clui = require('clui');
 const readline = require('readline');
 const Game = require('../abstract-game');
 const anagramWordList = require('./anagram-word-list');
+const anagramConstants = require('./anagram-constants');
 require('events').EventEmitter.defaultMaxListeners = 100;
-
-const TOTAL_SECONDS = 30;
-const STARTING_LINE = 10;
 
 /**
  * Anagram game - displays shuffled 9 letter word to user and they have to guess what it is
@@ -42,15 +40,15 @@ class AnagramGame extends Game {
       output: process.stdout
     });
 
-    this.logger.log(figlet.textSync('ANAGRAM', { font: 'Mini' }));
-    this.logger.log('Solve the anagram:');
+    this.logger.log(figlet.textSync(anagramConstants.GAME_TITLE, { font: 'Mini' }));
+    this.logger.log(anagramConstants.GAME_INFO);
     this.logger.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
 
     this.startCountdown();
   }
 
   startCountdown() {
-    this.total = TOTAL_SECONDS;
+    this.total = anagramConstants.TOTAL_SECONDS;
     this.current = this.total;
     this.logger.log('\n');
     this.displayProgressAndPrompt();
@@ -106,7 +104,7 @@ class AnagramGame extends Game {
         } else {
           this.incorrectGuess = true;
           this.stopCountdown();
-          this.logger.write(chalk.red('INCORRECT! Unlucky, guess again'));
+          this.logger.write(chalk.red(anagramConstants.INCORRECT_GUESS_MSG));
           this.resumeCountdown();
         }
       });
@@ -144,14 +142,14 @@ class AnagramGame extends Game {
    * Moves cursor to the start of the line that is displaying the progress bar timer
    */
   moveCursorToProgressBar() {
-    readline.cursorTo(process.stdin, 0, STARTING_LINE);
+    readline.cursorTo(process.stdin, 0, anagramConstants.STARTING_LINE);
   }
 
   /**
    * Moves cursor to the start of the line that is prompting user for answer
    */
   moveCursorToAnswerPrompt() {
-    readline.cursorTo(process.stdin, 0, STARTING_LINE + 1);
+    readline.cursorTo(process.stdin, 0, anagramConstants.STARTING_LINE + 1);
   }
 
   gameWon() {
@@ -162,7 +160,7 @@ class AnagramGame extends Game {
 
   gameLost() {
     this.finishGame();
-    super.gameLost(this.answer, '\nTIME\'S UP!\n');
+    super.gameLost(this.answer, anagramConstants.GAME_OVER_MSG);
   }
 
   finishGame() {

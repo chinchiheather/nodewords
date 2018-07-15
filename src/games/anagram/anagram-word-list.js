@@ -143,12 +143,6 @@ const eightLetters = [
     drawback: 'backward'
   },
   {
-    'cheaters; teachers': 'hectares'
-  },
-  {
-    hectares: 'cheaters; teachers'
-  },
-  {
     misprint: 'imprints'
   },
   {
