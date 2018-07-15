@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "lint": "eslint src/**/*.js",
-    "test": "jest"
+    "test": "NODE_ENV=test jest",
+    "test:watch": "npm test -- --watch"
   },
   "bin": {
     "nodewords": "./bin/nodewords.js"

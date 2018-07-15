@@ -3,10 +3,14 @@ const chalk = require('chalk');
 const figlet = require('figlet');
 
 class UIHelper {
+  constructor(logger) {
+    this.logger = logger;
+  }
+
   /**
    * Animates flashing 'WINNER' text
    */
-  static flashWinner() {
+  flashWinner() {
     return new Promise((resolve) => {
       let counter = 0;
       const starChar = '\u2605';
@@ -30,14 +34,14 @@ class UIHelper {
    * Animates revealing the answer
    * This is shown to users when they have lost a game
    */
-  static revealAnswer(answer) {
+  revealAnswer(answer) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        process.stdout.write('\nThe correct answer was');
+        this.logger.write('\nThe correct answer was');
 
         this.animateEllipsis().then(() => {
           setTimeout(() => {
-            process.stdout.write('\n');
+            this.logger.write('\n');
             this.showAnswer(answer);
             setTimeout(() => { resolve(); }, 500);
           }, 500);
@@ -49,11 +53,11 @@ class UIHelper {
   /**
    * Animates adding three dots to end of current line
    */
-  static animateEllipsis() {
+  animateEllipsis() {
     return new Promise((resolve) => {
       let count = 0;
       const interval = setInterval(() => {
-        process.stdout.write('.');
+        this.logger.write('.');
         if (++count === 3) {
           clearInterval(interval);
           resolve();
@@ -62,8 +66,8 @@ class UIHelper {
     });
   }
 
-  static showAnswer(answer) {
-    console.log(chalk.green(figlet.textSync(answer, { font: 'Cybermedium' })));
+  showAnswer(answer) {
+    this.logger.log(chalk.green(figlet.textSync(answer, { font: 'Cybermedium' })));
   }
 }
 

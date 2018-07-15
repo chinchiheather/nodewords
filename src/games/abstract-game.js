@@ -5,6 +5,8 @@ const Logger = require('../helpers/logger');
 class Game {
   constructor() {
     this.logger = new Logger();
+    this.uiHelper = new UIHelper(this.logger);
+
     this.playPromise = new Promise((resolve) => {
       this.resolvePlay = resolve;
     });
@@ -21,14 +23,14 @@ class Game {
 
   gameWon(answer) {
     if (answer) {
-      UIHelper.showAnswer(answer);
+      this.uiHelper.showAnswer(answer);
     }
-    UIHelper.flashWinner().then(() => this.resolvePlay());
+    this.uiHelper.flashWinner().then(() => this.resolvePlay());
   }
 
   gameLost(answer, message = '\nGAME OVER!\n') {
     this.logger.log(chalk.red(message));
-    UIHelper.revealAnswer(answer).then(() => this.resolvePlay());
+    this.uiHelper.revealAnswer(answer).then(() => this.resolvePlay());
   }
 }
 
