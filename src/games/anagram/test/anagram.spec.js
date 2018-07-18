@@ -1,85 +1,44 @@
 
 /* eslint-env jest */
-/* eslint-disable no-return-assign, global-require */
+/* eslint-disable no-return-assign, global-require, prefer-destructuring */
 
 const anagramConstants = require('../anagram-constants');
+const MockHelper = require('../../../../test/helpers/mock-helper');
 
 describe('Anagram', () => {
   let anagramGame;
 
   let gaugeString;
   let clearSpy;
-  let logSpy;
-  let writeSpy;
-  let gaugeSpy;
-  let promptSpy;
-  let mockWordList;
-  let uiRunSpy;
-  let uiCloseSpy;
-  let revealAnswerSpy;
   let readlineMock;
+  let inquirerMock;
+  let uiMock;
+  let promptMock;
+  let cluiMock;
   let chalkMock;
-  let promptCallback;
+  let loggerMock;
+  let uiHelperMock;
+
+  let mockWordList;
   let word;
   let shuffled;
-  let showAnswerSpy;
-  let flashWinnerSpy;
-  let flashWinnerCallback;
   let playResolved;
 
   beforeEach(() => {
     jest.useFakeTimers();
 
-    // todo: centralise some of this mocking so other files can use them
-    // todo: use promise spy helper?
-    jest.mock('clear', () => clearSpy = jest.fn());
-    jest.mock('figlet', () => ({
-      textSync: text => text
-    }));
-    jest.mock('readline', () => readlineMock = ({
-      createInterface: jest.fn(),
-      clearLine: jest.fn(),
-      cursorTo: jest.fn()
-    }));
-    jest.mock('inquirer', () => ({
-      prompt: promptSpy = jest.fn(() => ({
-        then: jest.fn((callback) => { promptCallback = callback; }),
-        ui: {
-          rl: {
-            on: () => null
-          },
-          run: uiRunSpy = jest.fn(),
-          close: uiCloseSpy = jest.fn()
-        }
-      }))
-    }));
-    jest.mock('clui', () => ({
-      Gauge: gaugeSpy = jest.fn().mockReturnValue(gaugeString = '|||||')
-    }));
-    // todo: improve this and add chaining
-    jest.mock('chalk', () => chalkMock = ({
-      red: jest.fn(message => message),
-      green: jest.fn(message => message)
-    }));
-    jest.mock('../../../helpers/logger', () =>
-      function mockLogger() {
-        return {
-          log: logSpy = jest.fn(),
-          write: writeSpy = jest.fn()
-        };
-      });
-    jest.mock('../../../helpers/ui-helper', () =>
-      function mockUiHelper() {
-        return {
-          revealAnswer: revealAnswerSpy = jest.fn(() => ({
-            then: () => null
-          })),
-          showAnswer: showAnswerSpy = jest.fn(),
-          flashWinner: flashWinnerSpy = jest.fn(() => ({
-            then: (callback) => { flashWinnerCallback = callback; }
-          }))
-        };
-      });
+    MockHelper.mockFiglet();
+    clearSpy = MockHelper.mockClear();
+    readlineMock = MockHelper.mockReadline();
+    cluiMock = MockHelper.mockClui(gaugeString = '|||||');
+    chalkMock = MockHelper.mockChalk();
+    loggerMock = MockHelper.mockLogger();
+    uiHelperMock = MockHelper.mockUiHelper();
+
+    const mockInquirer = MockHelper.mockInquirer();
+    inquirerMock = mockInquirer.inquirer;
+    uiMock = mockInquirer.ui;
+    promptMock = mockInquirer.prompt;
 
     jest.mock('../anagram-word-list', () => mockWordList =
       [{ slipper: 'ripples' }, { license: 'silence' }, { trainer: 'terrain' }]);
@@ -113,22 +72,22 @@ describe('Anagram', () => {
     });
 
     it('displays game title and info', () => {
-      expect(logSpy).toHaveBeenCalledWith(anagramConstants.GAME_TITLE);
-      expect(logSpy).toHaveBeenCalledWith(anagramConstants.GAME_INFO);
+      expect(loggerMock.log).toHaveBeenCalledWith(anagramConstants.GAME_TITLE);
+      expect(loggerMock.log).toHaveBeenCalledWith(anagramConstants.GAME_INFO);
     });
 
     it('displays anagram to solve', () => {
-      expect(logSpy).toHaveBeenCalledWith(shuffled);
+      expect(loggerMock.log).toHaveBeenCalledWith(shuffled);
     });
 
     it('displays prompt for user to input answer', () => {
-      const question = promptSpy.mock.calls[0][0][0];
+      const question = inquirerMock.prompt.mock.calls[0][0][0];
       expect(question.type).toBe('input');
       expect(question.message).toBe('Answer');
     });
 
     it('displays countdown progress bar', () => {
-      expect(logSpy).toHaveBeenCalledWith(gaugeString);
+      expect(loggerMock.log).toHaveBeenCalledWith(gaugeString);
     });
 
     it('starts countdown', () => {
@@ -138,8 +97,7 @@ describe('Anagram', () => {
 
   describe('Countdown progress bar', () => {
     function checkProgressBar(current) {
-      // todo: check cursor pos
-      expect(gaugeSpy).toHaveBeenCalledWith(current, 30, 31, 30, `${current}s`);
+      expect(cluiMock.Gauge).toHaveBeenCalledWith(current, 30, 31, 30, `${current}s`);
     }
 
     it('starts at 30s', () => {
@@ -159,7 +117,7 @@ describe('Anagram', () => {
       });
 
       it('redisplays answer prompt', () => {
-        expect(uiRunSpy).toHaveBeenCalled();
+        expect(uiMock.run).toHaveBeenCalled();
       });
     });
 
@@ -185,13 +143,13 @@ describe('Anagram', () => {
         expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 11);
         expect(readlineMock.clearLine).toHaveBeenCalled();
 
-        expect(uiCloseSpy).toHaveBeenCalled();
+        expect(uiMock.close).toHaveBeenCalled();
       });
 
       it('shows user losing message in red', () => {
         expect(chalkMock.red).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
-        expect(logSpy).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
-        expect(revealAnswerSpy).toHaveBeenCalled();
+        expect(loggerMock.log).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
+        expect(uiHelperMock.revealAnswer).toHaveBeenCalled();
       });
     });
   });
@@ -200,7 +158,7 @@ describe('Anagram', () => {
     describe('and answer is incorrect', () => {
       beforeEach(() => {
         setInterval.mockReset();
-        promptCallback({ solution: 'incorrect guess' });
+        promptMock.onSuccess({ solution: 'incorrect guess' });
       });
 
       it('stops countdown temporarily', () => {
@@ -209,7 +167,7 @@ describe('Anagram', () => {
 
       it('shows user incorrect guess message in red', () => {
         expect(chalkMock.red).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
-        expect(writeSpy).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
+        expect(loggerMock.write).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
       });
 
       it('resumes countdown after 1s', () => {
@@ -225,7 +183,7 @@ describe('Anagram', () => {
 
     describe('and answer is correct', () => {
       beforeEach(() => {
-        promptCallback({ solution: 'ripples' });
+        promptMock.onSuccess({ solution: 'ripples' });
       });
 
       it('stops countdown', () => {
@@ -241,19 +199,19 @@ describe('Anagram', () => {
         expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 11);
         expect(readlineMock.clearLine).toHaveBeenCalled();
 
-        expect(uiCloseSpy).toHaveBeenCalled();
+        expect(uiMock.close).toHaveBeenCalled();
       });
 
       it('shows user answer in green', () => {
-        expect(showAnswerSpy).toHaveBeenCalledWith('ripples');
+        expect(uiHelperMock.showAnswer).toHaveBeenCalledWith('ripples');
       });
 
       it('shows user winner message', () => {
-        expect(flashWinnerSpy).toHaveBeenCalled();
+        expect(uiHelperMock.flashWinner).toHaveBeenCalled();
       });
 
       it('resolves promise from play() finished showing winning message', (done) => {
-        flashWinnerCallback();
+        uiHelperMock.flashWinner.onSuccess();
         jest.useRealTimers();
         setTimeout(() => {
           expect(playResolved).toBe(true);
