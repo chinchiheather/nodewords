@@ -25,9 +25,6 @@ class HangmanGame extends Game {
    * Start a new hangman game
    */
   startGame() {
-    clear();
-    this.logger.log('\n');
-
     const randomIdx = Math.floor(Math.random() * this.hangmanWordList.length);
     [this.word] = this.hangmanWordList.splice(randomIdx, 1);
 
@@ -79,11 +76,11 @@ class HangmanGame extends Game {
       this.logger.log(figlet.textSync(display, { font: 'Cybermedium' }));
       HangmanPrompts.promptForGuess().then((answer) => {
         switch (answer.guess) {
-          case 'letter':
+          case hangmanConstants.LETTER:
             this.guessLetter();
             break;
 
-          case 'answer':
+          case hangmanConstants.ANSWER:
             this.guessAnswer();
             break;
 

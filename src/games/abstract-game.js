@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const UIHelper = require('../helpers/ui-helper');
 const Logger = require('../helpers/logger');
+const gameConstants = require('./game-constants');
 
 class Game {
   constructor() {
@@ -28,7 +29,7 @@ class Game {
     this.uiHelper.flashWinner().then(() => this.resolvePlay());
   }
 
-  gameLost(answer, message = '\nGAME OVER!\n') {
+  gameLost(answer, message = gameConstants.GAME_OVER_MSG) {
     this.logger.log(chalk.red(message));
     this.uiHelper.revealAnswer(answer).then(() => this.resolvePlay());
   }

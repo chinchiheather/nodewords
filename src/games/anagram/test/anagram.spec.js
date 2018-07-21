@@ -9,14 +9,14 @@ describe('Anagram', () => {
   let anagramGame;
 
   let clearSpy;
-  let readlineMock;
-  let inquirerMock;
-  let uiMock;
-  let promptMock;
-  let cluiMock;
-  let chalkMock;
-  let loggerMock;
-  let uiHelperMock;
+  let mockReadline;
+  let mockInquirer;
+  let mockUi;
+  let mockPrompt;
+  let mockClui;
+  let mockChalk;
+  let mockLogger;
+  let mockUiHelper;
 
   let gaugeString;
   let mockWordList;
@@ -29,16 +29,16 @@ describe('Anagram', () => {
 
     MockHelper.mockFiglet();
     clearSpy = MockHelper.mockClear();
-    readlineMock = MockHelper.mockReadline();
-    cluiMock = MockHelper.mockClui(gaugeString = '|||||');
-    chalkMock = MockHelper.mockChalk();
-    loggerMock = MockHelper.mockLogger();
-    uiHelperMock = MockHelper.mockUiHelper();
+    mockReadline = MockHelper.mockReadline();
+    mockClui = MockHelper.mockClui(gaugeString = '|||||');
+    mockChalk = MockHelper.mockChalk();
+    mockLogger = MockHelper.mockLogger();
+    mockUiHelper = MockHelper.mockUiHelper();
 
-    const mockInquirer = MockHelper.mockInquirer();
-    inquirerMock = mockInquirer.inquirer;
-    uiMock = mockInquirer.ui;
-    promptMock = mockInquirer.prompt;
+    const inquirer = MockHelper.mockInquirer();
+    mockInquirer = inquirer.inquirer;
+    mockUi = inquirer.ui;
+    mockPrompt = inquirer.prompt;
 
     jest.mock('../anagram-word-list', () => mockWordList =
       [{ slipper: 'ripples' }, { license: 'silence' }, { trainer: 'terrain' }]);
@@ -72,22 +72,22 @@ describe('Anagram', () => {
     });
 
     it('displays game title and info', () => {
-      expect(loggerMock.log).toHaveBeenCalledWith(anagramConstants.GAME_TITLE);
-      expect(loggerMock.log).toHaveBeenCalledWith(anagramConstants.GAME_INFO);
+      expect(mockLogger.log).toHaveBeenCalledWith(anagramConstants.GAME_TITLE);
+      expect(mockLogger.log).toHaveBeenCalledWith(anagramConstants.GAME_INFO);
     });
 
     it('displays anagram to solve', () => {
-      expect(loggerMock.log).toHaveBeenCalledWith(shuffled);
+      expect(mockLogger.log).toHaveBeenCalledWith(shuffled);
     });
 
     it('displays prompt for user to input answer', () => {
-      const question = inquirerMock.prompt.mock.calls[0][0][0];
+      const question = mockInquirer.prompt.mock.calls[0][0][0];
       expect(question.type).toBe('input');
       expect(question.message).toBe('Answer');
     });
 
     it('displays countdown progress bar', () => {
-      expect(loggerMock.log).toHaveBeenCalledWith(gaugeString);
+      expect(mockLogger.log).toHaveBeenCalledWith(gaugeString);
     });
 
     it('starts countdown', () => {
@@ -97,7 +97,7 @@ describe('Anagram', () => {
 
   describe('Countdown progress bar', () => {
     function checkProgressBar(current) {
-      expect(cluiMock.Gauge).toHaveBeenCalledWith(current, 30, 31, 30, `${current}s`);
+      expect(mockClui.Gauge).toHaveBeenCalledWith(current, 30, 31, 30, `${current}s`);
     }
 
     it('starts at 30s', () => {
@@ -117,7 +117,7 @@ describe('Anagram', () => {
       });
 
       it('redisplays answer prompt', () => {
-        expect(uiMock.run).toHaveBeenCalled();
+        expect(mockUi.run).toHaveBeenCalled();
       });
     });
 
@@ -125,8 +125,8 @@ describe('Anagram', () => {
       beforeEach(() => {
         jest.advanceTimersByTime(29000);
 
-        readlineMock.cursorTo.mockReset();
-        readlineMock.clearLine.mockReset();
+        mockReadline.cursorTo.mockReset();
+        mockReadline.clearLine.mockReset();
         jest.advanceTimersByTime(1000);
       });
 
@@ -135,21 +135,21 @@ describe('Anagram', () => {
       });
 
       it('stops showing progress bar', () => {
-        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
-        expect(readlineMock.clearLine).toHaveBeenCalled();
+        expect(mockReadline.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
+        expect(mockReadline.clearLine).toHaveBeenCalled();
       });
 
       it('stops showing answer prompt', () => {
-        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 11);
-        expect(readlineMock.clearLine).toHaveBeenCalled();
+        expect(mockReadline.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 11);
+        expect(mockReadline.clearLine).toHaveBeenCalled();
 
-        expect(uiMock.close).toHaveBeenCalled();
+        expect(mockUi.close).toHaveBeenCalled();
       });
 
       it('shows user losing message in red', () => {
-        expect(chalkMock.red).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
-        expect(loggerMock.log).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
-        expect(uiHelperMock.revealAnswer).toHaveBeenCalled();
+        expect(mockChalk.red).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
+        expect(mockLogger.log).toHaveBeenCalledWith(anagramConstants.GAME_OVER_MSG);
+        expect(mockUiHelper.revealAnswer).toHaveBeenCalled();
       });
     });
   });
@@ -158,7 +158,7 @@ describe('Anagram', () => {
     describe('and answer is incorrect', () => {
       beforeEach(() => {
         setInterval.mockReset();
-        promptMock.onSuccess({ solution: 'incorrect guess' });
+        mockPrompt.onSuccess({ solution: 'incorrect guess' });
       });
 
       it('stops countdown temporarily', () => {
@@ -166,8 +166,8 @@ describe('Anagram', () => {
       });
 
       it('shows user incorrect guess message in red', () => {
-        expect(chalkMock.red).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
-        expect(loggerMock.write).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
+        expect(mockChalk.red).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
+        expect(mockLogger.write).toHaveBeenCalledWith(anagramConstants.INCORRECT_GUESS_MSG);
       });
 
       it('resumes countdown after 1s', () => {
@@ -176,14 +176,14 @@ describe('Anagram', () => {
       });
 
       it('removes incorrect guess message after 1s', () => {
-        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
-        expect(readlineMock.clearLine).toHaveBeenCalled();
+        expect(mockReadline.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
+        expect(mockReadline.clearLine).toHaveBeenCalled();
       });
     });
 
     describe('and answer is correct', () => {
       beforeEach(() => {
-        promptMock.onSuccess({ solution: 'ripples' });
+        mockPrompt.onSuccess({ solution: 'ripples' });
       });
 
       it('stops countdown', () => {
@@ -191,27 +191,27 @@ describe('Anagram', () => {
       });
 
       it('stops showing progress bar', () => {
-        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
-        expect(readlineMock.clearLine).toHaveBeenCalled();
+        expect(mockReadline.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 10);
+        expect(mockReadline.clearLine).toHaveBeenCalled();
       });
 
       it('stops showing answer prompt', () => {
-        expect(readlineMock.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 11);
-        expect(readlineMock.clearLine).toHaveBeenCalled();
+        expect(mockReadline.cursorTo).toHaveBeenCalledWith(process.stdin, 0, 11);
+        expect(mockReadline.clearLine).toHaveBeenCalled();
 
-        expect(uiMock.close).toHaveBeenCalled();
+        expect(mockUi.close).toHaveBeenCalled();
       });
 
       it('shows user answer in green', () => {
-        expect(uiHelperMock.showAnswer).toHaveBeenCalledWith('ripples');
+        expect(mockUiHelper.showAnswer).toHaveBeenCalledWith('ripples');
       });
 
       it('shows user winner message', () => {
-        expect(uiHelperMock.flashWinner).toHaveBeenCalled();
+        expect(mockUiHelper.flashWinner).toHaveBeenCalled();
       });
 
       it('resolves promise from play() finished showing winning message', (done) => {
-        uiHelperMock.flashWinner.onSuccess();
+        mockUiHelper.flashWinner.onSuccess();
         jest.useRealTimers();
         setTimeout(() => {
           expect(playResolved).toBe(true);
