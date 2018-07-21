@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const UIHelper = require('../helpers/ui-helper');
 const Logger = require('../helpers/logger');
-const gameConstants = require('./game-constants');
+const gameConstants = require('./base-game-constants');
 
 class Game {
   constructor() {

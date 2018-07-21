@@ -4,7 +4,7 @@
 const MockHelper = require('../../../../test/helpers/mock-helper');
 const PromiseSpy = require('../../../../test/helpers/promise-spy');
 const hangmanConstants = require('../hangman-constants');
-const gameConstants = require('../../game-constants');
+const gameConstants = require('../../base-game-constants');
 const hangmanStages = require('../hangman-stages');
 
 describe('Hangman', () => {

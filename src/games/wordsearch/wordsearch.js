@@ -2,7 +2,7 @@ const clear = require('clear');
 const readline = require('readline');
 const chalk = require('chalk');
 const figlet = require('figlet');
-const Game = require('../abstract-game');
+const Game = require('../base-game');
 const wordList = require('../word-list');
 const letterList = require('./wordsearch-letter-list');
 
