@@ -8,6 +8,11 @@ const letterList = require('./wordsearch-letter-list');
 
 const STARTING_LINE = 7;
 
+/**
+ * Wordsearch game - displays grid of letters to user with a list of words to find,
+ * they use arrow keys to traverse grid and hit space key to select a letter, the
+ * game is over when all words in the list have been found
+ */
 class WordsearchGame extends Game {
   constructor() {
     super();

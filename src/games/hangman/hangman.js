@@ -5,21 +5,19 @@ const Game = require('../abstract-game');
 const hangmanStages = require('./hangman-stages');
 const HangmanPrompts = require('./hangman-prompts');
 const wordList = require('../word-list');
+const hangmanConstants = require('./hangman-constants');
 
 /**
  * Hangman game - displays letter placeholders to user and they guess
  * letter by letter to complete the word, or can also just go for it and
  * guess the full answer)
  */
-
-// todo: use constants here and in anagram for magic strings
 class HangmanGame extends Game {
   constructor() {
     super();
     this.guessed = [];
     this.word = null;
     this.incorrectGuesses = 0;
-    this.maxIncorrectGuesses = 0;
     this.hangmanWordList = [...wordList];
   }
 
@@ -42,7 +40,6 @@ class HangmanGame extends Game {
     }
 
     this.incorrectGuesses = 0;
-    this.maxIncorrectGuesses = 11;
     this.guessed = [];
 
     this.displayHangman();
@@ -54,7 +51,7 @@ class HangmanGame extends Game {
    */
   displayHangman() {
     clear();
-    console.log(figlet.textSync('HANGMAN', { font: 'Mini' }));
+    console.log(figlet.textSync(hangmanConstants.GAME_TITLE, { font: 'Mini' }));
 
     const hangmanImage = hangmanStages[this.incorrectGuesses];
     console.log(hangmanImage);
@@ -75,10 +72,10 @@ class HangmanGame extends Game {
 
     if (hasWon) {
       this.gameWon(this.word);
-    } else if (this.incorrectGuesses === this.maxIncorrectGuesses) {
+    } else if (this.incorrectGuesses === hangmanConstants.TOTAL_GUESSES) {
       this.gameLost(this.word);
     } else {
-      console.log('Solve the hangman puzzle:\n');
+      console.log(hangmanConstants.GAME_INFO);
       console.log(figlet.textSync(display, { font: 'Cybermedium' }));
       HangmanPrompts.promptForGuess().then((answer) => {
         switch (answer.guess) {
@@ -91,7 +88,7 @@ class HangmanGame extends Game {
             break;
 
           default:
-            console.log(`Oops! Unhandled option ${answer.guessOption}`);
+            console.log(`${hangmanConstants.UNHANDLED_OPTION} ${answer.guessOption}`);
         }
       });
     }
@@ -112,7 +109,7 @@ class HangmanGame extends Game {
       if (answer.answer === this.word) {
         this.guessed = [...this.letters];
       } else {
-        console.log(chalk.red('\nINCORRECT! Unlucky, keep going\n'));
+        console.log(chalk.red(hangmanConstants.INCORRECT_GUESS));
         this.incorrectGuesses++;
       }
       this.displayHangman();

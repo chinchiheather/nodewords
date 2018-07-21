@@ -8,7 +8,6 @@ const MockHelper = require('../../../../test/helpers/mock-helper');
 describe('Anagram', () => {
   let anagramGame;
 
-  let gaugeString;
   let clearSpy;
   let readlineMock;
   let inquirerMock;
@@ -19,6 +18,7 @@ describe('Anagram', () => {
   let loggerMock;
   let uiHelperMock;
 
+  let gaugeString;
   let mockWordList;
   let word;
   let shuffled;
