@@ -210,7 +210,7 @@ describe('Anagram', () => {
         expect(mockUiHelper.flashWinner).toHaveBeenCalled();
       });
 
-      it('resolves promise from play() finished showing winning message', (done) => {
+      it('resolves promise from play() when finished showing winning message', (done) => {
         mockUiHelper.flashWinner.onSuccess();
         jest.useRealTimers();
         setTimeout(() => {
