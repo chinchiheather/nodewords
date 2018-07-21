@@ -26,7 +26,7 @@ class HangmanGame extends Game {
    */
   startGame() {
     clear();
-    console.log('\n');
+    this.logger.log('\n');
 
     const randomIdx = Math.floor(Math.random() * this.hangmanWordList.length);
     [this.word] = this.hangmanWordList.splice(randomIdx, 1);
@@ -51,10 +51,10 @@ class HangmanGame extends Game {
    */
   displayHangman() {
     clear();
-    console.log(figlet.textSync(hangmanConstants.GAME_TITLE, { font: 'Mini' }));
+    this.logger.log(figlet.textSync(hangmanConstants.GAME_TITLE, { font: 'Mini' }));
 
     const hangmanImage = hangmanStages[this.incorrectGuesses];
-    console.log(hangmanImage);
+    this.logger.log(hangmanImage);
 
     let display = '';
     let hasWon = true;
@@ -75,8 +75,8 @@ class HangmanGame extends Game {
     } else if (this.incorrectGuesses === hangmanConstants.TOTAL_GUESSES) {
       this.gameLost(this.word);
     } else {
-      console.log(hangmanConstants.GAME_INFO);
-      console.log(figlet.textSync(display, { font: 'Cybermedium' }));
+      this.logger.log(hangmanConstants.GAME_INFO);
+      this.logger.log(figlet.textSync(display, { font: 'Cybermedium' }));
       HangmanPrompts.promptForGuess().then((answer) => {
         switch (answer.guess) {
           case 'letter':
@@ -88,7 +88,7 @@ class HangmanGame extends Game {
             break;
 
           default:
-            console.log(`${hangmanConstants.UNHANDLED_OPTION} ${answer.guessOption}`);
+            this.logger.log(`${hangmanConstants.UNHANDLED_OPTION} ${answer.guessOption}`);
         }
       });
     }
@@ -109,7 +109,7 @@ class HangmanGame extends Game {
       if (answer.answer === this.word) {
         this.guessed = [...this.letters];
       } else {
-        console.log(chalk.red(hangmanConstants.INCORRECT_GUESS));
+        this.logger.log(chalk.red(hangmanConstants.INCORRECT_GUESS));
         this.incorrectGuesses++;
       }
       this.displayHangman();
