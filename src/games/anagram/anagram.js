@@ -166,6 +166,7 @@ class AnagramGame extends Game {
   finishGame() {
     this.answerPrompt.ui.close();
     this.answerPrompt = null;
+    this.rl.close();
   }
 }
 
