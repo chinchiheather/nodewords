@@ -134,9 +134,9 @@ class WordsearchGame extends Game {
     const { id, selected } = this.currentWord;
 
     clear();
-    console.log(figlet.textSync(wordsearchConstants.GAME_TITLE, { font: 'Mini' }));
-    console.log(wordsearchConstants.GAME_INFO);
-    console.log(chalk.grey(wordsearchConstants.GAME_INSTRUCTIONS));
+    this.logger.log(figlet.textSync(wordsearchConstants.GAME_TITLE, { font: 'Mini' }));
+    this.logger.log(wordsearchConstants.GAME_INFO);
+    this.logger.log(chalk.grey(wordsearchConstants.GAME_INSTRUCTIONS));
 
     this.grid.forEach((row, rowIdx) => {
       // first add all letters in the row (with correct colours)
@@ -162,7 +162,7 @@ class WordsearchGame extends Game {
         rowStr += word;
       }
 
-      console.log(rowStr);
+      this.logger.log(rowStr);
     });
 
     this.setCursorPos();
