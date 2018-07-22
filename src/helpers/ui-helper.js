@@ -1,6 +1,7 @@
-const logUpdate = require('log-update');
 const chalk = require('chalk');
 const figlet = require('figlet');
+const readline = require('readline');
+const gameConstants = require('../games/base-game-constants');
 
 class UIHelper {
   constructor(logger) {
@@ -12,19 +13,20 @@ class UIHelper {
    */
   flashWinner() {
     return new Promise((resolve) => {
+      this.logger.log('\n');
+
       let counter = 0;
-      const starChar = '\u2605';
-      const tripleStars = Array(3).fill(starChar).join(' ');
-      const winnerMessage = `${tripleStars} WINNER! ${tripleStars}\n`;
       const interval = setInterval(() => {
+        readline.moveCursor(process.stdin, -gameConstants.WINNER_MSG.length, -1);
+        readline.clearLine(process.stdin, 0);
         if (counter > 4) {
           clearInterval(interval);
-          logUpdate.done();
+          this.logger.log('\n');
           resolve();
         } else if (counter++ % 2 === 0) {
-          logUpdate(chalk.black.bgGreen(winnerMessage));
+          this.logger.write(chalk.black.bgGreen(gameConstants.WINNER_MSG));
         } else {
-          logUpdate(chalk.green(winnerMessage));
+          this.logger.write(chalk.green(gameConstants.WINNER_MSG));
         }
       }, 250);
     });

@@ -32,8 +32,7 @@
     "clear": "^0.1.0",
     "clui": "^0.3.6",
     "figlet": "^1.2.0",
-    "inquirer": "^5.2.0",
-    "log-update": "^2.3.0"
+    "inquirer": "^5.2.0"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
