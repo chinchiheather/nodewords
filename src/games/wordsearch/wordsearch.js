@@ -5,8 +5,7 @@ const figlet = require('figlet');
 const Game = require('../base-game');
 const wordList = require('../word-list');
 const letterList = require('./wordsearch-letter-list');
-
-const STARTING_LINE = 7;
+const wordsearchConstants = require('./wordsearch-constants');
 
 /**
  * Wordsearch game - displays grid of letters to user with a list of words to find,
@@ -16,7 +15,7 @@ const STARTING_LINE = 7;
 class WordsearchGame extends Game {
   constructor() {
     super();
-    this.gridSize = 15;
+    this.gridSize = wordsearchConstants.GRID_SIZE;
     this.currentWord = {
       id: null,
       letters: [],
@@ -135,9 +134,9 @@ class WordsearchGame extends Game {
     const { id, selected } = this.currentWord;
 
     clear();
-    console.log(figlet.textSync('WORDSEARCH', { font: 'Mini' }));
-    console.log('Find the words in the grid');
-    console.log(chalk.grey('(Use the arrow keys to move around, and the space key to select a letter)\n'));
+    console.log(figlet.textSync(wordsearchConstants.GAME_TITLE, { font: 'Mini' }));
+    console.log(wordsearchConstants.GAME_INFO);
+    console.log(chalk.grey(wordsearchConstants.GAME_INSTRUCTIONS));
 
     this.grid.forEach((row, rowIdx) => {
       // first add all letters in the row (with correct colours)
@@ -253,7 +252,7 @@ class WordsearchGame extends Game {
    * This is needed after redrawing the grid, we don't want the user to lose their position
    */
   setCursorPos() {
-    readline.cursorTo(process.stdout, this.cursorPos.col, STARTING_LINE + this.cursorPos.row);
+    readline.cursorTo(process.stdout, this.cursorPos.col, wordsearchConstants.STARTING_LINE + this.cursorPos.row);
   }
 
   gameWon() {
