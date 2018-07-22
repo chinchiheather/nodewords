@@ -25,12 +25,24 @@ class MockHelper {
   }
 
   static mockReadline() {
+    const mockInterface = {
+      input: {
+        on: jest.fn(),
+        removeEventListener: jest.fn()
+      },
+      close: jest.fn()
+    };
+
     const mock = {
-      createInterface: jest.fn(),
+      createInterface: jest.fn(() => mockInterface),
       clearLine: jest.fn(),
       cursorTo: jest.fn()
     };
-    return this.mockModule('readline', mock);
+
+    return {
+      readline: this.mockModule('readline', mock),
+      interface: mockInterface
+    };
   }
 
   static mockInquirer() {
@@ -66,7 +78,8 @@ class MockHelper {
     // todo: add chaining
     const mock = {
       red: jest.fn(message => message),
-      green: jest.fn(message => message)
+      green: jest.fn(message => message),
+      grey: jest.fn(message => message)
     };
     return this.mockModule('chalk', mock);
   }

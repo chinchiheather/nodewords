@@ -29,11 +29,13 @@ describe('Anagram', () => {
 
     MockHelper.mockFiglet();
     clearSpy = MockHelper.mockClear();
-    mockReadline = MockHelper.mockReadline();
     mockClui = MockHelper.mockClui(gaugeString = '|||||');
     mockChalk = MockHelper.mockChalk();
     mockLogger = MockHelper.mockLogger();
     mockUiHelper = MockHelper.mockUiHelper();
+
+    const readline = MockHelper.mockReadline();
+    mockReadline = readline.readline;
 
     const inquirer = MockHelper.mockInquirer();
     mockInquirer = inquirer.inquirer;
