@@ -15,6 +15,41 @@ describe('Wordsearch', () => {
   let mockUiHelper;
 
   let playResolved;
+  let randomCallCount;
+  let mockWordList;
+  let randomReturnVals;
+
+  jest.mock('../../word-list', () => mockWordList = [
+    'apple',
+    'banana',
+    'cherry',
+    'dragonfruit',
+    'elderberry',
+    'fig',
+    'grape',
+    'honeydew',
+    'kiwi',
+    'lemon',
+    'mango',
+    'nectarine',
+    'orange',
+    'pear',
+    'quince'
+  ]);
+
+  function startGame() {
+    const WordsearchGame = require('../wordsearch');
+    wordsearchGame = new WordsearchGame();
+    wordsearchGame.play().then(() => { playResolved = true; });
+  }
+
+  function mockMathRandom(returnVals) {
+    let mockedRandom = jest.spyOn(Math, 'random');
+
+    returnVals.forEach((val) => {
+      mockedRandom = mockedRandom.mockReturnValueOnce(val);
+    });
+  }
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -30,9 +65,10 @@ describe('Wordsearch', () => {
     mockReadline = readline.readline;
     mockInterface = readline.interface;
 
-    const WordsearchGame = require('../wordsearch');
-    wordsearchGame = new WordsearchGame();
-    wordsearchGame.play().then(() => { playResolved = true; });
+    randomReturnVals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(val => val / 15);
+    mockMathRandom(randomReturnVals);
+
+    startGame();
   });
 
   afterEach(() => {
@@ -50,11 +86,47 @@ describe('Wordsearch', () => {
       expect(mockLogger.log).toHaveBeenCalledWith(wordsearchConstants.GAME_INSTRUCTIONS);
     });
 
-
     it('randomly picks word list', () => {
+      expect(wordsearchGame.wordsearchWordList).toEqual(mockWordList);
     });
 
-    it('randomly positions words in grid', () => {});
+    it('selects unique words for wordlist', () => {
+      randomReturnVals = [0, 0, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(val => val / 15);
+      mockMathRandom(randomReturnVals);
+      startGame();
+
+      expect(wordsearchGame.wordsearchWordList).toEqual(mockWordList);
+    });
+
+    it('sorts list alphabetically', () => {
+      randomReturnVals = [0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13].map(val => val / 15);
+      mockMathRandom(randomReturnVals);
+      startGame();
+
+      expect(wordsearchGame.wordsearchWordList).toEqual(mockWordList);
+    });
+
+    it('randomly positions words in grid', () => {
+      randomReturnVals = [
+        ...randomReturnVals, // these are for selecting words
+        0, // this causes first word to be positioned horizontally
+        0.999999, // this causes first word to be placed on last row
+        0 // this causes first word to start at first col of last row
+      ];
+      mockMathRandom(randomReturnVals);
+      startGame();
+
+      // first word is 'apple'
+      const grid = wordsearchGame.grid;
+      const expectedWord = [];
+      for (let i = 0, len = 'apple'.length; i < len; i++) {
+        expectedWord.push(grid[14][i].letter);
+      }
+
+      expect(expectedWord.join('')).toEqual('apple');
+    });
+
+    it('fills in empty spaces in grid with random letters', () => {});
 
     it('displays grid to user', () => {});
 

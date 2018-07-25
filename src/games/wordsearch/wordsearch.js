@@ -31,8 +31,14 @@ class WordsearchGame extends Game {
     this.wordsearchWordList = [];
     for (let i = 0; i < this.gridSize; i++) {
       const randomIdx = Math.floor(Math.random() * wordList.length);
-      this.wordsearchWordList.push(wordList[randomIdx]);
+      const word = wordList[randomIdx];
+      if (this.wordsearchWordList.indexOf(word) === -1) {
+        this.wordsearchWordList.push(word);
+      } else {
+        i--;
+      }
     }
+    this.wordsearchWordList = this.wordsearchWordList.sort();
 
     this.buildGrid();
   }
@@ -42,11 +48,11 @@ class WordsearchGame extends Game {
    * Places the selected words in the grid, then fills in the spaces with random letters
    */
   buildGrid() {
-    this.grid = Array(this.gridSize).fill(null);
-    this.grid = this.grid.map(() => Array(this.gridSize).fill({
-      letter: null,
-      word: null
-    }));
+    this.grid = [...Array(this.gridSize).fill(null)]
+      .map(() => Array(this.gridSize).fill({
+        letter: null,
+        word: null
+      }));
 
     this.wordsearchWordList.forEach((word, wordIdx) => {
       const { row, col, isHorizontal } = this.findWordPosition(word);
