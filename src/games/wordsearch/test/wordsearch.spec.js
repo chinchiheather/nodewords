@@ -4,6 +4,30 @@
 const wordsearchConstants = require('../wordsearch-constants');
 const MockHelper = require('../../../../test/helpers/mock-helper');
 
+const mockWordList = [
+  'apple',
+  'banana',
+  'cherry',
+  'dragonfruit',
+  'elderberry',
+  'fig',
+  'grape',
+  'honeydew',
+  'kiwi',
+  'lemon',
+  'mango',
+  'nectarine',
+  'orange',
+  'pear',
+  'quince'
+];
+const mockLetterList = [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm'
+];
+
+jest.mock('../../word-list', () => mockWordList);
+jest.mock('../wordsearch-letter-list', () => mockLetterList);
+
 describe('Wordsearch', () => {
   let wordsearchGame;
 
@@ -16,26 +40,7 @@ describe('Wordsearch', () => {
 
   let playResolved;
   let randomCallCount;
-  let mockWordList;
   let randomReturnVals;
-
-  jest.mock('../../word-list', () => mockWordList = [
-    'apple',
-    'banana',
-    'cherry',
-    'dragonfruit',
-    'elderberry',
-    'fig',
-    'grape',
-    'honeydew',
-    'kiwi',
-    'lemon',
-    'mango',
-    'nectarine',
-    'orange',
-    'pear',
-    'quince'
-  ]);
 
   function startGame() {
     const WordsearchGame = require('../wordsearch');
@@ -49,6 +54,30 @@ describe('Wordsearch', () => {
     returnVals.forEach((val) => {
       mockedRandom = mockedRandom.mockReturnValueOnce(val);
     });
+  }
+
+  /**
+   * Sets result of Math.random for selecting words, selecting position of
+   * words, and then the letters to fill in the space between
+   */
+  function mockFullGrid() {
+    const selectWordRandomReturnVals = Array(15).fill(null).map((val, idx) => idx / 15);
+
+    const wordPosRandomReturnVals = Array(15).fill(null).map((item, idx) => [
+      0, idx / 15, 0
+    ]).reduce((prev, curr) => [...prev, ...curr], []);
+
+    const letterRandomReturnVals = mockWordList
+      .map(word => Array(15 - word.length).fill(null)
+        .map((item, idx) => idx / 12)).reduce((prev, curr) => [...prev, ...curr], []);
+
+    randomReturnVals = [
+      ...selectWordRandomReturnVals,
+      ...wordPosRandomReturnVals,
+      ...letterRandomReturnVals
+    ];
+
+    mockMathRandom(randomReturnVals);
   }
 
   beforeEach(() => {
@@ -65,9 +94,7 @@ describe('Wordsearch', () => {
     mockReadline = readline.readline;
     mockInterface = readline.interface;
 
-    randomReturnVals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(val => val / 15);
-    mockMathRandom(randomReturnVals);
-
+    mockFullGrid();
     startGame();
   });
 
@@ -107,30 +134,33 @@ describe('Wordsearch', () => {
     });
 
     it('randomly positions words in grid', () => {
-      randomReturnVals = [
-        ...randomReturnVals, // these are for selecting words
-        0, // this causes first word to be positioned horizontally
-        0.999999, // this causes first word to be placed on last row
-        0 // this causes first word to start at first col of last row
-      ];
-      mockMathRandom(randomReturnVals);
-      startGame();
-
-      // first word is 'apple'
       const grid = wordsearchGame.grid;
       const expectedWord = [];
-      for (let i = 0, len = 'apple'.length; i < len; i++) {
-        expectedWord.push(grid[14][i].letter);
+      for (let i = 0, len = mockWordList[0].length; i < len; i++) {
+        expectedWord.push(grid[0][i].letter);
       }
 
-      expect(expectedWord.join('')).toEqual('apple');
+      expect(expectedWord.join('')).toEqual(mockWordList[0]);
     });
 
-    it('fills in empty spaces in grid with random letters', () => {});
+    it('fills in empty spaces in grid with random letters', () => {
+      const grid = wordsearchGame.grid;
+      const firstLine = grid[0].map(item => item.letter)
+        .join('');
+      const expected = mockWordList[0] + mockLetterList.slice(0, 15 - mockWordList[0].length).join('');
 
-    it('displays grid to user', () => {});
+      expect(firstLine).toBe(expected);
+    });
 
-    it('displays word list to user', () => {});
+    it('displays grid and word list to user', () => {
+      const expectedLines = mockWordList.map((word) => {
+        const gridLetters = word + mockLetterList.slice(0, 15 - word.length).join('');
+        return gridLetters.split('').join(' ') + wordsearchConstants.WORD_SPACING + word;
+      });
+      expectedLines.forEach(((expected) => {
+        expect(mockLogger.log).toHaveBeenCalledWith(expected);
+      }));
+    });
   });
 
   describe('Pressing arrow keys', () => {

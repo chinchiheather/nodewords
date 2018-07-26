@@ -160,7 +160,7 @@ class WordsearchGame extends Game {
 
       // then add a word from the word list to the right of the grid
       if (this.wordsearchWordList[rowIdx]) {
-        rowStr += '       ';
+        rowStr += wordsearchConstants.WORD_SPACING;
         let word = this.wordsearchWordList[rowIdx];
         if (this.guessedWords.indexOf(rowIdx) !== -1) {
           word = chalk.green(word);
