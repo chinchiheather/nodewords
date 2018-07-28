@@ -1,6 +1,7 @@
 # Nodewords
+[![CircleCI](https://img.shields.io/circleci/project/github/chinchiheather/nodewords.svg)](https://circleci.com/gh/chinchiheather/nodewords/tree/master)
 
-Command line word games written in node
+Command line word games that run in Node
 
 ## Setup
 ```bash
