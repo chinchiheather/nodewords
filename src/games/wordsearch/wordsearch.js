@@ -181,27 +181,35 @@ class WordsearchGame extends Game {
    */
   onKeyPress(str, key) {
     switch (key.name) {
-      case 'up':
+      case wordsearchConstants.KEY_UP:
         if (this.cursorPos.row > 0) {
           this.cursorPos.row--;
+        } else {
+          return;
         }
         break;
-      case 'down':
+      case wordsearchConstants.KEY_DOWN:
         if (this.cursorPos.row < this.gridSize - 1) {
           this.cursorPos.row++;
+        } else {
+          return;
         }
         break;
-      case 'left':
+      case wordsearchConstants.KEY_LEFT:
         if (this.cursorPos.col > 0) {
           this.cursorPos.col -= 2;
+        } else {
+          return;
         }
         break;
-      case 'right':
+      case wordsearchConstants.KEY_RIGHT:
         if (this.cursorPos.col < (this.gridSize - 1) * 2) {
           this.cursorPos.col += 2;
+        } else {
+          return;
         }
         break;
-      case 'space': {
+      case wordsearchConstants.KEY_SPACE: {
         this.onSpaceKeyPressed();
         break;
       }

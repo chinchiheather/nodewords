@@ -28,7 +28,7 @@ class MockHelper {
     const mockInterface = {
       input: {
         on: jest.fn(),
-        removeEventListener: jest.fn()
+        removeListener: jest.fn()
       },
       close: jest.fn()
     };
@@ -79,7 +79,8 @@ class MockHelper {
     const mock = {
       red: jest.fn(message => message),
       green: jest.fn(message => message),
-      grey: jest.fn(message => message)
+      grey: jest.fn(message => message),
+      black: { bgGreen: jest.fn(message => message) }
     };
     return this.mockModule('chalk', mock);
   }
