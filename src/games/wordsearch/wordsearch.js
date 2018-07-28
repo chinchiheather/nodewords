@@ -2,16 +2,20 @@ const clear = require('clear');
 const readline = require('readline');
 const chalk = require('chalk');
 const figlet = require('figlet');
-const Game = require('../abstract-game');
+const Game = require('../base-game');
 const wordList = require('../word-list');
 const letterList = require('./wordsearch-letter-list');
+const wordsearchConstants = require('./wordsearch-constants');
 
-const STARTING_LINE = 7;
-
+/**
+ * Wordsearch game - displays grid of letters to user with a list of words to find,
+ * they use arrow keys to traverse grid and hit space key to select a letter, the
+ * game is over when all words in the list have been found
+ */
 class WordsearchGame extends Game {
   constructor() {
     super();
-    this.gridSize = 15;
+    this.gridSize = wordsearchConstants.GRID_SIZE;
     this.currentWord = {
       id: null,
       letters: [],
@@ -27,8 +31,14 @@ class WordsearchGame extends Game {
     this.wordsearchWordList = [];
     for (let i = 0; i < this.gridSize; i++) {
       const randomIdx = Math.floor(Math.random() * wordList.length);
-      this.wordsearchWordList.push(wordList[randomIdx]);
+      const word = wordList[randomIdx];
+      if (this.wordsearchWordList.indexOf(word) === -1) {
+        this.wordsearchWordList.push(word);
+      } else {
+        i--;
+      }
     }
+    this.wordsearchWordList = this.wordsearchWordList.sort();
 
     this.buildGrid();
   }
@@ -38,11 +48,11 @@ class WordsearchGame extends Game {
    * Places the selected words in the grid, then fills in the spaces with random letters
    */
   buildGrid() {
-    this.grid = Array(this.gridSize).fill(null);
-    this.grid = this.grid.map(() => Array(this.gridSize).fill({
-      letter: null,
-      word: null
-    }));
+    this.grid = [...Array(this.gridSize).fill(null)]
+      .map(() => Array(this.gridSize).fill({
+        letter: null,
+        word: null
+      }));
 
     this.wordsearchWordList.forEach((word, wordIdx) => {
       const { row, col, isHorizontal } = this.findWordPosition(word);
@@ -130,9 +140,9 @@ class WordsearchGame extends Game {
     const { id, selected } = this.currentWord;
 
     clear();
-    console.log(figlet.textSync('WORDSEARCH', { font: 'Mini' }));
-    console.log('Find the words in the grid');
-    console.log(chalk.grey('(Use the arrow keys to move around, and the space key to select a letter)\n'));
+    this.logger.log(figlet.textSync(wordsearchConstants.GAME_TITLE, { font: 'Mini' }));
+    this.logger.log(wordsearchConstants.GAME_INFO);
+    this.logger.log(chalk.grey(wordsearchConstants.GAME_INSTRUCTIONS));
 
     this.grid.forEach((row, rowIdx) => {
       // first add all letters in the row (with correct colours)
@@ -150,7 +160,7 @@ class WordsearchGame extends Game {
 
       // then add a word from the word list to the right of the grid
       if (this.wordsearchWordList[rowIdx]) {
-        rowStr += '       ';
+        rowStr += wordsearchConstants.WORD_SPACING;
         let word = this.wordsearchWordList[rowIdx];
         if (this.guessedWords.indexOf(rowIdx) !== -1) {
           word = chalk.green(word);
@@ -158,7 +168,7 @@ class WordsearchGame extends Game {
         rowStr += word;
       }
 
-      console.log(rowStr);
+      this.logger.log(rowStr);
     });
 
     this.setCursorPos();
@@ -171,27 +181,35 @@ class WordsearchGame extends Game {
    */
   onKeyPress(str, key) {
     switch (key.name) {
-      case 'up':
+      case wordsearchConstants.KEY_UP:
         if (this.cursorPos.row > 0) {
           this.cursorPos.row--;
+        } else {
+          return;
         }
         break;
-      case 'down':
+      case wordsearchConstants.KEY_DOWN:
         if (this.cursorPos.row < this.gridSize - 1) {
           this.cursorPos.row++;
+        } else {
+          return;
         }
         break;
-      case 'left':
+      case wordsearchConstants.KEY_LEFT:
         if (this.cursorPos.col > 0) {
           this.cursorPos.col -= 2;
+        } else {
+          return;
         }
         break;
-      case 'right':
+      case wordsearchConstants.KEY_RIGHT:
         if (this.cursorPos.col < (this.gridSize - 1) * 2) {
           this.cursorPos.col += 2;
+        } else {
+          return;
         }
         break;
-      case 'space': {
+      case wordsearchConstants.KEY_SPACE: {
         this.onSpaceKeyPressed();
         break;
       }
@@ -248,7 +266,7 @@ class WordsearchGame extends Game {
    * This is needed after redrawing the grid, we don't want the user to lose their position
    */
   setCursorPos() {
-    readline.cursorTo(process.stdout, this.cursorPos.col, STARTING_LINE + this.cursorPos.row);
+    readline.cursorTo(process.stdout, this.cursorPos.col, wordsearchConstants.STARTING_LINE + this.cursorPos.row);
   }
 
   gameWon() {

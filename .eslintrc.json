@@ -4,10 +4,11 @@
     "rules": {
         "class-methods-use-this": 0,
         "comma-dangle": ["error", "never"],
+        "guard-for-in": 0,
         "max-len": ["error", 120],
-        "no-console": 0,
         "no-mixed-operators": 0,
         "no-plusplus": 0,
+        "no-restricted-syntax": 0,
         "no-use-before-define": ["error", { "functions": false }]
     }
 }
