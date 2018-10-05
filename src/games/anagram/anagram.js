@@ -35,11 +35,6 @@ class AnagramGame extends Game {
     const shuffledWord = Object.keys(word)[0];
     this.answer = word[shuffledWord];
 
-    this.rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-
     this.logger.log(figlet.textSync(anagramConstants.GAME_TITLE, { font: 'Mini' }));
     this.logger.log(anagramConstants.GAME_INFO);
     this.logger.log(figlet.textSync(shuffledWord, { font: 'Cybermedium' }));
@@ -104,7 +99,7 @@ class AnagramGame extends Game {
         } else {
           this.incorrectGuess = true;
           this.stopCountdown();
-          this.logger.write(chalk.red(anagramConstants.INCORRECT_GUESS_MSG));
+          this.logger.write(this.rl.input, chalk.red(anagramConstants.INCORRECT_GUESS_MSG));
           this.resumeCountdown();
         }
       });
@@ -124,7 +119,7 @@ class AnagramGame extends Game {
    * Clear current line of console
    */
   clearLine() {
-    readline.clearLine(process.stdin, 0);
+    readline.clearLine(this.rl.input, 0);
   }
 
   /**
@@ -142,14 +137,14 @@ class AnagramGame extends Game {
    * Moves cursor to the start of the line that is displaying the progress bar timer
    */
   moveCursorToProgressBar() {
-    readline.cursorTo(process.stdin, 0, anagramConstants.STARTING_LINE);
+    readline.cursorTo(this.rl.input, 0, anagramConstants.STARTING_LINE);
   }
 
   /**
    * Moves cursor to the start of the line that is prompting user for answer
    */
   moveCursorToAnswerPrompt() {
-    readline.cursorTo(process.stdin, 0, anagramConstants.STARTING_LINE + 1);
+    readline.cursorTo(this.rl.input, 0, anagramConstants.STARTING_LINE + 1);
   }
 
   gameWon() {

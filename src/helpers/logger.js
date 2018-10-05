@@ -5,8 +5,8 @@ class Logger {
     console.log(...args);
   }
 
-  write(message) {
-    process.stdin.write(message);
+  write(input, message) {
+    input.write(message);
   }
 }
 

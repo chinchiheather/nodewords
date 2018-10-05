@@ -124,10 +124,6 @@ class WordsearchGame extends Game {
    * select a letter
    */
   setupReadline() {
-    this.rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
     this.cursorPos = { col: 0, row: this.gridSize };
     this.rl.input.on('keypress', this.onKeyPress);
   }
