@@ -18,10 +18,10 @@ nodewords
 ## Games
 
 ### Anagram
-![anagram](https://chinchiheather.github.io/nodewords/img/anagram.gif)
+![anagram](https://chinchiheather.github.io/images/nodewords/img/anagram.gif)
 
 ### Hangman
-![hangman](https://chinchiheather.github.io/nodewords/img/hangman.gif)
+![hangman](https://chinchiheather.github.io/images/nodewords/img/hangman.gif)
 
 ### Wordsearch
-![wordsearch](https://chinchiheather.github.io/nodewords/img/wordsearch.gif)
+![wordsearch](https://chinchiheather.github.io/images/nodewords/img/wordsearch.gif)
